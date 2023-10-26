@@ -1,0 +1,23 @@
+version: '3'
+
+vars:
+  PROJECT_ID: php-01hdpgnv25h
+  REGION: northamerica-northeast1
+  NAME: management
+
+
+tasks:
+  enable-apis:
+    desc: enable required APIs
+    cmds:
+      - gcloud services enable container.googleapis.com --project={{.PROJECT_ID}}
+
+  create-vpc:
+    desc: create VPC
+    cmds:
+      - gcloud compute networks create {{.NAME}} --subnet-mode=auto --bgp-routing-mode=regional --mtu=1460 --project={{.PROJECT_ID}}
+
+  create-auto:
+    desc: create gke autopilot k8s cluster
+    cmds:
+      - gcloud container --project {{.PROJECT_ID}} clusters create-auto "{{.NAME}}-auto" --region {{.REGION}} --release-channel "regular" --network "projects/{{.PROJECT_ID}}/global/networks/{{.NAME}}" --subnetwork "projects/{{.PROJECT_ID}}/regions/{{.REGION}}/subnetworks/{{.NAME}}" --cluster-ipv4-cidr "/17"
