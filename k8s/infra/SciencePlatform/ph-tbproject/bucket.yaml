@@ -1,0 +1,10 @@
+apiVersion: storage.gcp.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  name: vertex-ai-bucket
+spec:
+  deletionPolicy: Delete
+  forProvider:
+    location: northamerica-northeast1
+  providerConfigRef:
+    name: gcp

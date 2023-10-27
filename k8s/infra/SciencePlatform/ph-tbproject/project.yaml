@@ -1,0 +1,34 @@
+apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+kind: Project
+metadata:
+  name: ph-tbproject
+  labels:
+    vanity-name: "ph-tbproject"
+    classification: ucll
+spec:
+  deletionPolicy: Delete
+  forProvider:
+    name: ph-tbproject
+    projectId: ph-tbproject
+    folderIdRef:
+      name: ph-tbproject
+    billingAccount: 016B6D-6AB281-505940
+  providerConfigRef:
+    name: gcp
+---
+apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+kind: ProjectIAMMember
+metadata:
+  name: ph-tbproject
+  labels:
+    vanity-name: "ph-tbproject"
+    classification: ucll
+spec:
+  deletionPolicy: Delete
+  forProvider:
+    member: "user:vedant.thapa@gcp.hc-sc.gc.ca"
+    projectRef:
+      name: ph-tbproject
+    role: roles/owner
+  providerConfigRef:
+    name: gcp

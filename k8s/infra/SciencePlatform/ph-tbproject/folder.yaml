@@ -1,0 +1,14 @@
+apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+kind: Folder
+metadata:
+  name: ph-tbproject
+  labels:
+    vanity-name: "ph-tbproject"
+    classification: ucll
+spec:
+  deletionPolicy: Delete
+  forProvider:
+    displayName: ph-tbproject
+    parent: folders/108494461414
+  providerConfigRef:
+    name: gcp
