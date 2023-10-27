@@ -4,6 +4,8 @@ vars:
   PROJECT_ID: php-01hdpgnv25h
   REGION: northamerica-northeast1
   NAME: management
+  REMOTE_FOLDER_ID: 108494461414
+
 
 
 tasks:
@@ -21,3 +23,25 @@ tasks:
     desc: create gke autopilot k8s cluster
     cmds:
       - gcloud container --project {{.PROJECT_ID}} clusters create-auto "{{.NAME}}-auto" --region {{.REGION}} --release-channel "regular" --network "projects/{{.PROJECT_ID}}/global/networks/{{.NAME}}" --subnetwork "projects/{{.PROJECT_ID}}/regions/{{.REGION}}/subnetworks/{{.NAME}}" --cluster-ipv4-cidr "/17"
+
+  create-service-account:
+    desc: create service account for resource provisions
+    cmds:
+      - gcloud iam service-accounts create {{.NAME}}-sa --display-name "{{.NAME}}-sa" --project {{.PROJECT_ID}}
+      - gcloud projects add-iam-policy-binding "{{.PROJECT_ID}}" --member "serviceAccount:{{.NAME}}-sa@{{.PROJECT_ID}}.iam.gserviceaccount.com" --role roles/editor
+      - gcloud projects add-iam-policy-binding "{{.PROJECT_ID}}" --member "serviceAccount:{{.NAME}}-sa@{{.PROJECT_ID}}.iam.gserviceaccount.com" --role roles/resourcemanager.projectIamAdmin
+      # - gcloud resource-manager folders add-iam-policy-binding {{.REMOTE_FOLDER_ID}} --member "serviceAccount:{{.NAME}}-sa@{{.PROJECT_ID}}.iam.gserviceaccount.com" --role roles/owner
+      - gcloud iam service-accounts keys create gcp-credentials.json --iam-account={{.NAME}}-sa@{{.PROJECT_ID}}.iam.gserviceaccount.com --project {{.PROJECT_ID}}
+
+  delete-service-account:
+    desc: delete service account for resource provisions
+    cmds:
+      - gcloud iam service-accounts delete {{.NAME}}-sa@{{.PROJECT_ID}}.iam.gserviceaccount.com
+
+
+  create-sa-secret:
+    desc: create k8s secret for the service account created in `create-service-account`
+    cmds:
+      - kubectl create secret generic {{.NAME}}-crossplane --namespace crossplane-system --from-file=creds=./gcp-credentials.json -o yaml --dry-run=client > k8s/crossplane-system/gcp-credentials.yaml
+      - kubeseal --format yaml --cert k8s/flux-system/pub-sealed-secrets.pem < k8s/crossplane-system/gcp-credentials.yaml > k8s/crossplane-system/gcp-credentials-enc.yaml
+      - rm -f k8s/crossplane-system/gcp-credentials.yaml
