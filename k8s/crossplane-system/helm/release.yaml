@@ -26,4 +26,4 @@ spec:
       packages:
         - xpkg.upbound.io/upbound/provider-gcp-cloudplatform:v0.38.0
         - xpkg.upbound.io/upbound/provider-gcp-storage:v0.38.0
-        -
+        - xpkg.upbound.io/upbound/provider-terraform:v0.11.0
