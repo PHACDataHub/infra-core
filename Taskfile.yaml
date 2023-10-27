@@ -13,6 +13,8 @@ tasks:
     desc: enable required APIs
     cmds:
       - gcloud services enable container.googleapis.com --project={{.PROJECT_ID}}
+      - gcloud services enable cloudresourcemanager.googleapis.com --project={{.PROJECT_ID}}
+      - gcloud services enable cloudbilling.googleapis.com --project={{.PROJECT_ID}}
 
   create-vpc:
     desc: create VPC
