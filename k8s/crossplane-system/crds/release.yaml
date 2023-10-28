@@ -22,14 +22,3 @@ spec:
   values:
     args:
       - --enable-environment-configs
-    provider:
-      packages:
-        # gcp
-        - xpkg.upbound.io/upbound/provider-gcp-cloudplatform:v0.38.0
-        - xpkg.upbound.io/upbound/provider-gcp-storage:v0.38.0
-        - xpkg.upbound.io/upbound/provider-gcp-dns:v0.38.0
-        - xpkg.upbound.io/upbound/provider-gcp-artifact:v0.38.0
-        - xpkg.upbound.io/upbound/provider-gcp-cloudbuild:v0.38.0
-        - xpkg.upbound.io/upbound/provider-gcp-compute:v0.38.0
-        # terraform
-        - xpkg.upbound.io/upbound/provider-terraform:v0.11.0

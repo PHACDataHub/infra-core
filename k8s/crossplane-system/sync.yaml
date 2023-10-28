@@ -6,13 +6,28 @@ metadata:
   namespace: flux-system
 spec:
   interval: 2m0s
-  path: ./k8s/crossplane-system/crds
+  path: ./k8s/crossplane-system/helm
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
   dependsOn:
     - name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: crossplane-system-providers
+  namespace: flux-system
+spec:
+  interval: 2m0s
+  path: ./k8s/crossplane-system/providers
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: crossplane-system-crds
   # to ensure providerconfig CRD exists before creating it's CR
   healthChecks:
     - apiVersion: apiextensions.k8s.io/v1
@@ -35,4 +50,4 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
-    - name: crossplane-system-crds
+    - name: crossplane-system-providers

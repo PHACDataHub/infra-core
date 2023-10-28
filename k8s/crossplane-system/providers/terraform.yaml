@@ -1,0 +1,8 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: upbound-terraform
+spec:
+  package: xpkg.upbound.io/upbound/provider-terraform:v0.11.0
+---
+
