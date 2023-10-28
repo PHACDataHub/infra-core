@@ -4,8 +4,6 @@ metadata:
   name: upbound-gcp-cloudplatform
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-cloudplatform:v0.38.0
-  controllerConfigRef:
-    name: resource-config
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -13,8 +11,6 @@ metadata:
   name: upbound-gcp-storage
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-storage:v0.38.0
-  controllerConfigRef:
-    name: resource-config
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -22,8 +18,6 @@ metadata:
   name: upbound-gcp-dns
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-dns:v0.38.0
-  controllerConfigRef:
-    name: resource-config
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -31,8 +25,6 @@ metadata:
   name: upbound-gcp-artifact
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-artifact:v0.38.0
-  controllerConfigRef:
-    name: resource-config
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -40,8 +32,6 @@ metadata:
   name: upbound-gcp-cloudbuild
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-cloudbuild:v0.38.0
-  controllerConfigRef:
-    name: resource-config
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
@@ -49,5 +39,3 @@ metadata:
   name: upbound-gcp-compute
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-compute:v0.38.0
-  controllerConfigRef:
-    name: resource-config

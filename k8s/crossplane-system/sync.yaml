@@ -6,13 +6,14 @@ metadata:
   namespace: flux-system
 spec:
   interval: 2m0s
-  path: ./k8s/crossplane-system/helm
+  path: ./k8s/crossplane-system/crds
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
   dependsOn:
     - name: flux-system
+  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -36,6 +37,7 @@ spec:
     - apiVersion: apiextensions.k8s.io/v1
       kind: CustomResourceDefinition
       name: providerconfigs.tf.upbound.io
+  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
