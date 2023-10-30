@@ -1,0 +1,126 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xdns.dip.phac.gc.ca
+spec:
+  group: dip.phac.gc.ca
+  names:
+    kind: XDns
+    plural: xdns
+  versions:
+    - name: v1beta1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the resource on gcp
+                dnsName:
+                  type: string
+                  description: DNS name to use, for instance 'example.com.'
+                region:
+                  type: string
+                  default: northamerica-northeast1
+              required:
+                - name
+                - dnsName
+            status:
+              type: object
+              properties:
+                ip_address:
+                  type: string
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: dns
+spec:
+  compositeTypeRef:
+    apiVersion: dip.phac.gc.ca/v1beta1
+    kind: XDns
+  resources:
+    - name: ip-address
+      base:
+        apiVersion: compute.gcp.upbound.io/v1beta1
+        kind: Address
+        spec:
+          deletionPolicy: Delete
+          forProvider: {}
+          providerConfigRef:
+            name: gcp
+      readinessChecks:
+        - type: NonEmpty
+          fieldPath: status.atProvider.address
+      patches:
+        # patch XR name with "-ip" suffix
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.name"
+          toFieldPath: "metadata.annotations[crossplane.io/external-name]"
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "%s-ip"
+        # patch region with default value from compositeTypeRef
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.region"
+          toFieldPath: "spec.forProvider.region"
+        # write ip address to compositeTypeRef status
+        - type: ToCompositeFieldPath
+          fromFieldPath: "status.atProvider.address"
+          toFieldPath: "status.ip_address"
+
+    - name: managed-zone
+      base:
+        apiVersion: dns.gcp.upbound.io/v1beta1
+        kind: ManagedZone
+        spec:
+          deletionPolicy: Delete
+          forProvider:
+            dnsName: example.com.
+            visibility: public
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch XR name with "-managed-zone" suffix
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.name"
+          toFieldPath: "metadata.annotations[crossplane.io/external-name]"
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "%s-managed-zone"
+        # patch DNS name from XR
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.dnsName"
+          toFieldPath: "spec.forProvider.dnsName"
+
+    - name: record-set-A
+      base:
+        apiVersion: dns.gcp.upbound.io/v1beta1
+        kind: RecordSet
+        spec:
+          forProvider:
+            managedZoneSelector:
+              matchControllerRef: true
+            ttl: 300
+            type: A
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch DNS name from XR
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.dnsName"
+          toFieldPath: "spec.forProvider.name"
+        # read and patch ip address from compositeTypeRef status
+        - type: FromCompositeFieldPath
+          fromFieldPath: "status.ip_address"
+          toFieldPath: "spec.forProvider.rrdatas[0]"

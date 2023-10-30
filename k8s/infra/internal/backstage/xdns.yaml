@@ -1,0 +1,8 @@
+---
+apiVersion: dip.phac.gc.ca/v1beta1
+kind: XDns
+metadata:
+  name: backstage
+spec:
+  name: backstage
+  dnsName: backstage.phac.alpha.canada.ca.

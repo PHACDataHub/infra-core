@@ -1,0 +1,12 @@
+apiVersion: artifact.gcp.upbound.io/v1beta1
+kind: RegistryRepository
+metadata:
+  name: backstage
+spec:
+  deletionPolicy: Delete
+  forProvider:
+    description: Docker repository to store backstage images
+    format: DOCKER
+    location: northamerica-northeast1
+  providerConfigRef:
+    name: gcp
