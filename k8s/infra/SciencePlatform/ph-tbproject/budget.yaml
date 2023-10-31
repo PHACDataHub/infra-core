@@ -14,15 +14,19 @@ spec:
       resource "google_billing_budget" "budget" {
         billing_account = var.billing_account_id
         display_name = var.display_name
+        
         budget_filter {
           projects = ["projects/${data.google_project.project.number}"]
           calendar_period = "YEAR"
+        }
+
         amount {
           specified_amount {
             currency_code = "CAD"
             units = "2000"
           }
         }
+
         threshold_rules {
             threshold_percent =  0.5
             spend_basis = "CURRENT_SPEND"
