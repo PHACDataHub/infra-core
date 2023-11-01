@@ -17,4 +17,4 @@ patches:
           name: resource-config
     target:
       kind: Provider
-      name: "(upbound-gcp-cloudplatform|upbound-gcp-storage|upbound-gcp-dns|upbound-gcp-artifact|upbound-gcp-cloudbuild|upbound-gcp-compute)"
+      name: "(upbound-gcp-cloudplatform|upbound-gcp-storage|upbound-gcp-dns|upbound-gcp-artifact|upbound-gcp-cloudbuild|upbound-gcp-compute|upbound-gcp-notebooks)"
