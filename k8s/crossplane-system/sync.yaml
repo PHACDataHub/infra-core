@@ -31,12 +31,30 @@ spec:
     - name: crossplane-system-crds
   # to ensure providerconfig CRD exists before creating it's CR
   healthChecks:
-    - apiVersion: apiextensions.k8s.io/v1
-      kind: CustomResourceDefinition
-      name: providerconfigs.gcp.upbound.io
-    - apiVersion: apiextensions.k8s.io/v1
-      kind: CustomResourceDefinition
-      name: providerconfigs.tf.upbound.io
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-gcp-cloudplatform
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-gcp-storage
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-gcp-dns
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-gcp-artifact
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-gcp-cloudbuild
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-gcp-compute
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-gcp-notebooks
+    - apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      name: upbound-terraform
   wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
