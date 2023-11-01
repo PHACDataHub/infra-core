@@ -1,10 +1,11 @@
 apiVersion: storage.gcp.upbound.io/v1beta1
 kind: Bucket
 metadata:
-  name: vertex-ai-bucket
+  name: vertex-ai-ph-tbproject
 spec:
   deletionPolicy: Delete
   forProvider:
     location: northamerica-northeast1
+    uniformBucketLevelAccess: true
   providerConfigRef:
-    name: gcp
+    name: gcp-tbproject
