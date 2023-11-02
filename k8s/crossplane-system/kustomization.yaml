@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
   - gcp-credentials-enc.yaml
   - provider-config.yaml
-  - controller-config.yaml
