@@ -3,6 +3,8 @@ kind: ControllerConfig
 metadata:
   name: resource-config
 spec:
+  args:
+    - "--debug"
   resources:
     requests:
       cpu: 250m
