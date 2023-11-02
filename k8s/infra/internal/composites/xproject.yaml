@@ -1,0 +1,431 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xproject.dip.phac.gc.ca
+spec:
+  defaultCompositeDeletePolicy: Foreground # https://docs.crossplane.io/latest/concepts/composite-resource-definitions/#defaultcompositedeletepolicy
+  group: dip.phac.gc.ca
+  names:
+    kind: XProject
+    plural: xproject
+  connectionSecretKeys:
+    - private_key
+  versions:
+    - name: v1beta1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                vanityName:
+                  type: string
+                  description: Name of the project
+                iamOwner:
+                  type: string
+                  description: Owner of the project
+                billingId:
+                  type: string
+                  description: Billing id of the project
+                  default: "016B6D-6AB281-505940"
+                dept:
+                  type: string
+                  description: Name of the dept
+                  default: ph
+                environment:
+                  type: string
+                  enum:
+                    - sp
+                    - x
+                  description: Environment this project belongs to
+                  default: sp
+                parentFolderId:
+                  type: string
+                  description: ID of the parent folder
+                  default: "108494461414"
+                region:
+                  type: string
+                  description: Region where project resources will be located
+                  default: northamerica-northeast1
+              required:
+                - vanityName
+                - iamOwner
+            status:
+              type: object
+              properties:
+                uniqueId:
+                  type: string
+                folderId:
+                  type: string
+                projectId:
+                  type: string
+                serviceAccountEmail:
+                  type: string
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: project
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: dip.phac.gc.ca/v1beta1
+    kind: XProject
+  resources:
+    # todo: use composition functions to generate this id
+    - name: UniqueID
+      base:
+        apiVersion: tf.upbound.io/v1beta1
+        kind: Workspace
+        spec:
+          forProvider:
+            source: Inline
+            module: |
+              terraform {
+                required_providers {
+                  random = {
+                    source = "hashicorp/random"
+                    version = "3.5.1"
+                  }
+                }
+              }
+
+              resource "random_id" "project_unique_id" {
+                byte_length = 8
+              }
+
+              output "project_id" {
+                value = random_id.project_unique_id.id
+              }
+          providerConfigRef:
+            name: terraform
+      patches:
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.outputs.project_id
+          toFieldPath: status.uniqueId
+          transforms:
+            - type: string
+              string:
+                type: Convert
+                convert: "ToLower"
+
+    - name: Folder
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: Folder
+        spec:
+          deletionPolicy: Delete
+          forProvider: {}
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch displayName with `dept`-`vanityName`
+        - type: CombineFromComposite
+          combine:
+            variables:
+              - fromFieldPath: spec.dept
+              - fromFieldPath: spec.vanityName
+            strategy: string
+            string:
+              fmt: "%s-%s"
+          toFieldPath: spec.forProvider.displayName
+        # patch parent folder with "folders/" suffix as per https://marketplace.upbound.io/providers/upbound/provider-gcp-cloudplatform/v0.38.0/resources/cloudplatform.gcp.upbound.io/Folder/v1beta1#doc:spec-forProvider-parent
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parentFolderId
+          toFieldPath: spec.forProvider.parent
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "folders/%s"
+        # write folderId to status
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.folderId
+          toFieldPath: status.folderId
+
+    - name: Project
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: Project
+        spec:
+          deletionPolicy: Delete
+          forProvider: {}
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch name with `dept``env`-`vanityName`
+        - type: CombineFromComposite
+          combine:
+            variables:
+              - fromFieldPath: spec.dept
+              - fromFieldPath: spec.environment
+              - fromFieldPath: spec.vanityName
+            strategy: string
+            string:
+              fmt: "%s%s-%s"
+          toFieldPath: spec.forProvider.name
+        # patch projectId with `dept``env`-`uniqueId`
+        - type: CombineFromComposite
+          combine:
+            variables:
+              - fromFieldPath: spec.dept
+              - fromFieldPath: spec.environment
+              - fromFieldPath: status.uniqueId
+            strategy: string
+            string:
+              fmt: "%s%s-%s"
+          toFieldPath: spec.forProvider.projectId
+          policy:
+            fromFieldPath: Required
+        # patch billingAccount with billingId field
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.billingId
+          toFieldPath: spec.forProvider.billingAccount
+        # patch folder ID from status field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.folderId
+          toFieldPath: spec.forProvider.folderId
+          policy:
+            fromFieldPath: Required
+        # write projectId to status
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.projectId
+          toFieldPath: status.projectId
+
+    - name: ServiceAccount
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ServiceAccount
+        spec:
+          deletionPolicy: Delete
+          forProvider:
+            displayName: resourceprovisioner
+            description: To provision resources within the project
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch project_id from status field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.projectId
+          toFieldPath: spec.forProvider.project
+          policy:
+            fromFieldPath: Required
+        # write serviceAccount email to status
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.email
+          toFieldPath: status.serviceAccountEmail
+
+    - name: ServiceAccountKey
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ServiceAccountKey
+        spec:
+          deletionPolicy: Delete
+          forProvider: {}
+          writeConnectionSecretToRef:
+            namespace: crossplane-system
+          providerConfigRef:
+            name: gcp
+      patches:        
+        # prefix connection secret name with metadata.uid
+        - type: FromCompositeFieldPath
+          fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.writeConnectionSecretToRef.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-resourceprovisioner-key"
+        # patch serviceAccountId from status.serviceAccountEmail field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.serviceAccountEmail
+          toFieldPath: spec.forProvider.serviceAccountId
+          policy:
+            fromFieldPath: Required
+      connectionDetails:
+        - fromConnectionSecretKey: private_key
+
+    - name: ProjectIAMMember-User
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ProjectIAMMember
+        spec:
+          deletionPolicy: Delete
+          forProvider:
+            role: roles/owner
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch member from spec.iamOwner field
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.iamOwner
+          toFieldPath: spec.forProvider.member
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "user:%s"
+        # patch project from status field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.projectId
+          toFieldPath: spec.forProvider.project
+          policy:
+            fromFieldPath: Required
+
+    - name: ProjectIAMMember-SA
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ProjectIAMMember
+        spec:
+          deletionPolicy: Delete
+          forProvider:
+            role: roles/storage.admin
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch member from status.serviceAccountEmail field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.serviceAccountEmail
+          toFieldPath: spec.forProvider.member
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "serviceAccount:%s"
+          policy:
+            fromFieldPath: Required
+        # patch project from status field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.projectId
+          toFieldPath: spec.forProvider.project
+          policy:
+            fromFieldPath: Required
+
+    - name: Budget
+      base:
+        # `budget` resources are not yet available in crossplane - https://github.com/upbound/provider-gcp/issues/95
+        apiVersion: tf.upbound.io/v1beta1
+        kind: Workspace
+        spec:
+          forProvider:
+            source: Inline
+            module: |
+              data "google_project" "project" {
+                project_id = var.project_id
+              }
+
+              resource "google_billing_budget" "budget" {
+                billing_account = var.billing_account_id
+                display_name = var.display_name
+
+                budget_filter {
+                  projects = ["projects/${data.google_project.project.number}"]
+                  calendar_period = "YEAR"
+                }
+
+                amount {
+                  specified_amount {
+                    currency_code = "CAD"
+                    units = "2000"
+                  }
+                }
+
+                threshold_rules {
+                    threshold_percent =  0.5
+                    spend_basis = "CURRENT_SPEND"
+                }
+                threshold_rules {
+                    threshold_percent =  0.9
+                    spend_basis = "CURRENT_SPEND"
+                }
+                threshold_rules {
+                    threshold_percent =  1.0
+                    spend_basis = "CURRENT_SPEND"
+                }
+
+              }
+
+              variable "billing_account_id" {
+                description = "ID of the billing account to set a budget on."
+                type        = string
+              }
+
+              variable "display_name" {
+                description = "User data for display name in UI. Must be <= 60 chars."
+                type        = string
+              }
+
+              variable "project_id" {
+                description = "Usage from only this project id should be included in the budget"
+                type        = string
+              }
+
+            vars:
+              - key: billing_account_id
+              - key: display_name
+              - key: project_id
+          providerConfigRef:
+            name: terraform
+      patches:
+        # patch billing_account_id with billingId field
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.billingId
+          toFieldPath: spec.forProvider.vars[0].value
+        # patch display_name with `dept`-`uniqueid`
+        - type: CombineFromComposite
+          combine:
+            variables:
+              - fromFieldPath: spec.dept
+              - fromFieldPath: status.uniqueId
+            strategy: string
+            string:
+              fmt: "%s-%s-budget"
+          toFieldPath: spec.forProvider.vars[1].value
+          policy:
+            fromFieldPath: Required
+        # patch project_id from status field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.projectId
+          toFieldPath: spec.forProvider.vars[2].value
+          policy:
+            fromFieldPath: Required
+
+    - name: ProviderConfig
+      base:
+        apiVersion: gcp.upbound.io/v1beta1
+        kind: ProviderConfig
+        spec:
+          credentials:
+            secretRef:
+              key: private_key
+              namespace: crossplane-system
+            source: Secret
+      patches:
+        # prefix connection secret name with metadata.uid
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.uid
+          toFieldPath: spec.credentials.secretRef.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-resourceprovisioner-key"
+        # patch name as gcp-`vanityName`
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.vanityName
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "gcp-%s"
+        # patch project from status field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.projectId
+          toFieldPath: spec.projectID
+          policy:
+            fromFieldPath: Required
+      # since ProviderConfig resources do not have a status
+      readinessChecks:
+        - type: None
