@@ -17,6 +17,7 @@ tasks:
       - gcloud services enable cloudbilling.googleapis.com --project={{.PROJECT_ID}}
       - gcloud services enable cloudbuild.googleapis.com --project={{.PROJECT_ID}}
       - gcloud services enable billingbudgets.googleapis.com --project={{.PROJECT_ID}}
+      - gcloud services enable serviceusage.googleapis.com --project={{.PROJECT_ID}}
 
   create-vpc:
     desc: create VPC
