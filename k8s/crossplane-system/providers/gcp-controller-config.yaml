@@ -1,11 +1,23 @@
 apiVersion: pkg.crossplane.io/v1alpha1
 kind: ControllerConfig
 metadata:
-  name: resource-config
+  name: resource-config-general
 spec:
   args:
     - "--debug"
   resources:
     requests:
       cpu: 250m
+      memory: 512Mi
+---
+apiVersion: pkg.crossplane.io/v1alpha1
+kind: ControllerConfig
+metadata:
+  name: resource-config-highutil
+spec:
+  args:
+    - "--debug"
+  resources:
+    requests:
+      cpu: 500m
       memory: 512Mi

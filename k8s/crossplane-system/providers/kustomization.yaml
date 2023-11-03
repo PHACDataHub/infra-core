@@ -14,7 +14,18 @@ patches:
         name: all
       spec:
         controllerConfigRef:
-          name: resource-config
+          name: resource-config-general
     target:
       kind: Provider
-      name: "(upbound-gcp-cloudplatform|upbound-gcp-storage|upbound-gcp-dns|upbound-gcp-artifact|upbound-gcp-cloudbuild|upbound-gcp-compute|upbound-gcp-notebooks)"
+      name: "(upbound-gcp-storage|upbound-gcp-dns|upbound-gcp-artifact|upbound-gcp-cloudbuild|upbound-gcp-compute|upbound-gcp-notebooks)"
+  - patch: |
+      apiVersion: pkg.crossplane.io/v1
+      kind: Provider
+      metadata:
+        name: all
+      spec:
+        controllerConfigRef:
+          name: resource-config-highutil
+    target:
+      kind: Provider
+      name: "(upbound-gcp-cloudplatform|upbound-terraform)"
