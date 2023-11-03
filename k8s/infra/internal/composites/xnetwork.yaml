@@ -1,0 +1,100 @@
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xnetwork.dip.phac.gc.ca
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: dip.phac.gc.ca
+  names:
+    kind: XNetwork
+    plural: xnetwork
+  versions:
+    - name: v1beta1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the resource on gcp
+                providerConfig:
+                  type: string
+                  description: Name of the Provider to use
+                ipCidrRange:
+                  type: string
+                  description: CIDR Range for the subnet
+                  default: "10.162.0.0/20"
+              required:
+                - name
+                - providerConfig
+            status:
+              type: object
+              properties:
+                networkId:
+                  type: string
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: network
+spec:
+  compositeTypeRef:
+    apiVersion: dip.phac.gc.ca/v1beta1
+    kind: XNetwork
+  patchSets:
+  # patch providerConfigRef and resource name
+  - name: name-providerconfig-patchset
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.providerConfig
+      toFieldPath: spec.providerConfigRef.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.name
+      toFieldPath: "metadata.annotations[crossplane.io/external-name]"
+  resources:
+    - name: Network
+      base:
+        apiVersion: compute.gcp.upbound.io/v1beta1
+        kind: Network
+        spec:
+          deletionPolicy: Delete
+          forProvider: 
+            autoCreateSubnetworks: false
+            mtu: 1460
+            routingMode: REGIONAL
+          providerConfigRef: {}
+      patches:
+        - type: PatchSet
+          patchSetName: name-providerconfig-patchset
+        # write id address to compositeTypeRef status
+        - type: ToCompositeFieldPath
+          fromFieldPath: "status.atProvider.id"
+          toFieldPath: "status.networkId"
+
+    - name: Subnet
+      base:
+        apiVersion: compute.gcp.upbound.io/v1beta1
+        kind: Subnetwork
+        spec:
+          deletionPolicy: Delete
+          forProvider: 
+            region: northamerica-northeast1
+          providerConfigRef: {}
+      patches:
+        - type: PatchSet
+          patchSetName: name-providerconfig-patchset
+        # patch ipCidrRange
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.ipCidrRange
+          toFieldPath: spec.forProvider.ipCidrRange
+        # patch network 
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.networkId
+          toFieldPath: spec.forProvider.network
+
