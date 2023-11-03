@@ -281,7 +281,7 @@ spec:
         spec:
           deletionPolicy: Delete
           forProvider:
-            role: roles/storage.admin
+            role: roles/owner
           providerConfigRef:
             name: gcp
       patches:
