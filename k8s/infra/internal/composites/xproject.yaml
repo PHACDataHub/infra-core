@@ -24,9 +24,17 @@ spec:
                 vanityName:
                   type: string
                   description: Name of the project
-                iamOwner:
+                iamUser:
                   type: string
-                  description: Owner of the project
+                  description: GCP user id for the project
+                iamUserRole:
+                  type: string
+                  description: GCP compatible role for the iamUser
+                  default: "roles/owner"
+                iamSARole:
+                  type: string
+                  description: GCP compatible role for the resourceprovisioner service account
+                  default: "roles/owner"
                 billingId:
                   type: string
                   description: Billing id of the project
@@ -52,7 +60,7 @@ spec:
                   default: northamerica-northeast1
               required:
                 - vanityName
-                - iamOwner
+                - iamUser
             status:
               type: object
               properties:
@@ -61,6 +69,8 @@ spec:
                 folderId:
                   type: string
                 projectId:
+                  type: string
+                projectNumber:
                   type: string
                 serviceAccountEmail:
                   type: string
@@ -194,6 +204,14 @@ spec:
         - type: ToCompositeFieldPath
           fromFieldPath: status.atProvider.projectId
           toFieldPath: status.projectId
+          policy:
+            fromFieldPath: Required
+        # write projectId to status
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.number
+          toFieldPath: status.projectNumber
+          policy:
+            fromFieldPath: Required
 
     - name: ServiceAccount
       base:
@@ -253,20 +271,23 @@ spec:
         kind: ProjectIAMMember
         spec:
           deletionPolicy: Delete
-          forProvider:
-            role: roles/owner
+          forProvider: {}
           providerConfigRef:
             name: gcp
       patches:
-        # patch member from spec.iamOwner field
+        # patch member from spec.iamUser field
         - type: FromCompositeFieldPath
-          fromFieldPath: spec.iamOwner
+          fromFieldPath: spec.iamUser
           toFieldPath: spec.forProvider.member
           transforms:
             - type: string
               string:
                 type: Format
                 fmt: "user:%s"
+        # patch role from spec.iamUserRole field
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.iamUserRole
+          toFieldPath: spec.forProvider.role
         # patch project from status field
         - type: FromCompositeFieldPath
           fromFieldPath: status.projectId
@@ -280,8 +301,7 @@ spec:
         kind: ProjectIAMMember
         spec:
           deletionPolicy: Delete
-          forProvider:
-            role: roles/owner
+          forProvider: {}
           providerConfigRef:
             name: gcp
       patches:
@@ -296,6 +316,10 @@ spec:
                 fmt: "serviceAccount:%s"
           policy:
             fromFieldPath: Required
+        # patch role from spec.iamSARole field
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.iamUserRole
+          toFieldPath: spec.forProvider.role
         # patch project from status field
         - type: FromCompositeFieldPath
           fromFieldPath: status.projectId
@@ -392,40 +416,3 @@ spec:
           policy:
             fromFieldPath: Required
 
-    - name: ProviderConfig
-      base:
-        apiVersion: gcp.upbound.io/v1beta1
-        kind: ProviderConfig
-        spec:
-          credentials:
-            secretRef:
-              key: private_key
-              namespace: crossplane-system
-            source: Secret
-      patches:
-        # prefix connection secret name with metadata.uid
-        - type: FromCompositeFieldPath
-          fromFieldPath: metadata.uid
-          toFieldPath: spec.credentials.secretRef.name"
-          transforms:
-            - type: string
-              string:
-                fmt: "%s-resourceprovisioner-key"
-        # patch name as gcp-`vanityName`
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.vanityName
-          toFieldPath: metadata.name
-          transforms:
-            - type: string
-              string:
-                type: Format
-                fmt: "gcp-%s"
-        # patch project from status field
-        - type: FromCompositeFieldPath
-          fromFieldPath: status.projectId
-          toFieldPath: spec.projectID
-          policy:
-            fromFieldPath: Required
-      # since ProviderConfig resources do not have a status
-      readinessChecks:
-        - type: None

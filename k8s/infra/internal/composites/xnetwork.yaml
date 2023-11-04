@@ -1,4 +1,3 @@
----
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
@@ -30,6 +29,10 @@ spec:
                   type: string
                   description: CIDR Range for the subnet
                   default: "10.162.0.0/20"
+                region:
+                  type: string
+                  description: Subnet region
+                  default: northamerica-northeast1
               required:
                 - name
                 - providerConfig
@@ -37,6 +40,8 @@ spec:
               type: object
               properties:
                 networkId:
+                  type: string
+                subnetworkId:
                   type: string
 ---
 apiVersion: apiextensions.crossplane.io/v1
@@ -72,7 +77,7 @@ spec:
       patches:
         - type: PatchSet
           patchSetName: name-providerconfig-patchset
-        # write id address to compositeTypeRef status
+        # write network id
         - type: ToCompositeFieldPath
           fromFieldPath: "status.atProvider.id"
           toFieldPath: "status.networkId"
@@ -97,4 +102,11 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: status.networkId
           toFieldPath: spec.forProvider.network
-
+        # patch region
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.region
+          toFieldPath: spec.forProvider.region
+        # write subnet id
+        - type: ToCompositeFieldPath
+          fromFieldPath: "status.atProvider.id"
+          toFieldPath: "status.subnetworkId"
