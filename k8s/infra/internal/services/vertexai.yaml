@@ -1,0 +1,330 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xvertexai.dip.phac.gc.ca
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: dip.phac.gc.ca
+  names:
+    kind: XVertexAI
+    plural: xvertexai
+  connectionSecretKeys:
+    - private_key
+  versions:
+    - name: v1beta1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the resource on gcp
+                iamUser:
+                  type: string
+                  description: GCP user id for the project
+                ipCidrRange:
+                  type: string
+                  description: CIDR Range for the subnet
+                  default: "10.162.0.0/20"
+                region:
+                  type: string
+                  description: Subnet region
+                  default: northamerica-northeast1
+              required:
+                - name
+                - iamUser
+            status:
+              type: object
+              properties:
+                xproject:
+                  type: object
+                  properties:
+                    projectId:
+                      type: string
+                    projectNumber:
+                      type: string
+                    serviceAccountEmail:
+                      type: string
+                xnetwork:
+                  type: object
+                  properties:
+                    networkId:
+                      type: string
+                    subnetworkId:
+                      type: string
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xvertexai
+spec:
+  compositeTypeRef:
+    apiVersion: dip.phac.gc.ca/v1beta1
+    kind: XVertexAI
+  resources:
+
+    - name: XProject
+      base:
+        apiVersion: dip.phac.gc.ca/v1beta1
+        kind: XProject
+        spec:
+          iamUser: "vedant.thapa@gcp.hc-sc.gc.ca"
+          writeConnectionSecretToRef:
+            namespace: crossplane-system
+      patches:
+        # patch vanityName from spec.name
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.vanityName
+        # patch iamUser from spec.iamUser
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.iamUser
+          toFieldPath: spec.iamUser
+        # write projectId
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.projectId
+          toFieldPath: status.xproject.projectId
+        # write projectNumber
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.projectNumber
+          toFieldPath: status.xproject.projectNumber
+        # prefix connection secret name with metadata.uid
+        - type: FromCompositeFieldPath
+          fromFieldPath: "metadata.uid"
+          toFieldPath: "spec.writeConnectionSecretToRef.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-resourceprovisioner-key"
+        # write serviceAccountEmail
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.serviceAccountEmail
+          toFieldPath: status.xproject.serviceAccountEmail
+      connectionDetails:
+        - fromConnectionSecretKey: private_key
+
+    - name: ProviderConfig
+      base:
+        apiVersion: gcp.upbound.io/v1beta1
+        kind: ProviderConfig
+        spec:
+          credentials:
+            secretRef:
+              key: private_key
+              namespace: crossplane-system
+            source: Secret
+      patches:
+        # prefix connection secret name with metadata.uid
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.uid
+          toFieldPath: spec.credentials.secretRef.name"
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-resourceprovisioner-key"
+        # patch name as gcp-`name`
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "gcp-%s"
+        # patch project from status field
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xproject.projectId
+          toFieldPath: spec.projectID
+          policy:
+            fromFieldPath: Required
+      # since ProviderConfig resources do not have a status
+      readinessChecks:
+        - type: None
+
+    - name: enable-service-usage
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ProjectService
+        spec:
+          forProvider:
+            disableDependentServices: true
+            service: serviceusage.googleapis.com
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch project_id 
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xproject.projectId
+          toFieldPath: spec.forProvider.project
+          policy:
+            fromFieldPath: Required
+
+    - name: enable-compute-engine
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ProjectService
+        spec:
+          forProvider:
+            disableDependentServices: true
+            service: compute.googleapis.com
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch project_id 
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xproject.projectId
+          toFieldPath: spec.forProvider.project
+          policy:
+            fromFieldPath: Required
+
+    - name: enable-cloudresourcemanager
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ProjectService
+        spec:
+          forProvider:
+            disableDependentServices: true
+            service: cloudresourcemanager.googleapis.com
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch project_id 
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xproject.projectId
+          toFieldPath: spec.forProvider.project
+          policy:
+            fromFieldPath: Required
+
+    - name: enable-notebooks
+      base:
+        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+        kind: ProjectService
+        spec:
+          forProvider:
+            disableDependentServices: true
+            service: notebooks.googleapis.com
+          providerConfigRef:
+            name: gcp
+      patches:
+        # patch project_id 
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xproject.projectId
+          toFieldPath: spec.forProvider.project
+          policy:
+            fromFieldPath: Required
+
+    # all resources from this point on use the gcp-`name` providerconfig (created above)
+    - name: XNetwork
+      base:
+        apiVersion: dip.phac.gc.ca/v1beta1
+        kind: XNetwork
+        spec: {}
+      patches:
+        # patch name
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.name
+        # patch ProviderConfig 
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.providerConfig
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "gcp-%s"
+        # patch ipCidrRange
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.ipCidrRange
+          toFieldPath: spec.ipCidrRange
+        # patch region
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.region
+          toFieldPath: spec.region
+        # write networkId
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.networkId
+          toFieldPath: status.xnetwork.networkId
+        # write subnetId
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.subnetworkId
+          toFieldPath: status.xnetwork.subnetworkId
+
+    - name: Bucket
+      base:
+        apiVersion: storage.gcp.upbound.io/v1beta1
+        kind: Bucket
+        spec: 
+          deletionPolicy: Delete
+          forProvider:
+            uniformBucketLevelAccess: true
+          providerConfigRef: {}
+      patches:
+        # patch ProviderConfig 
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.providerConfigRef.name
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "gcp-%s"
+        # patch region
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.region
+          toFieldPath: spec.forProvider.location
+
+    - name: Notebook
+      base:
+        apiVersion: notebooks.gcp.upbound.io/v1beta1
+        kind: Runtime
+        metadata:
+          name: tbproject-dev
+        spec:
+          forProvider:
+            accessConfig:
+              - accessType: SERVICE_ACCOUNT
+            softwareConfig:
+              - enableHealthMonitoring: true
+                idleShutdown: true
+                idleShutdownTimeout: 120
+            virtualMachine:
+              - virtualMachineConfig:
+                  - dataDisk:
+                      - initializeParams:
+                          - diskSizeGb: 100
+                            diskType: PD_STANDARD
+                    machineType: n1-standard-1
+          providerConfigRef: {}
+      patches:
+        # patch ProviderConfig 
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.providerConfigRef.name
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "gcp-%s"
+        # patch region
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.region
+          toFieldPath: spec.forProvider.location
+        # patch runtimeOwner 
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xproject.projectNumber
+          toFieldPath: spec.forProvider.accessConfig[0].runtimeOwner
+          transforms:
+            - type: string
+              string:
+                type: Format
+                fmt: "%s-compute@developer.gserviceaccount.com"
+        # patch subnet
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xnetwork.subnetworkId
+          toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].subnet
