@@ -5,9 +5,9 @@ slack: Slack alerts\nchannel {
 }
 
 internet: The Internet {
-    icon: ./icons/gcp/my_cloud.svg
-    shape: image
-  }
+  icon: ./icons/gcp/my_cloud.svg
+  shape: image
+}
 
 devs: Developers {
   icon: ./icons/general/Developer_(94088)_-_The_Noun_Project.svg
@@ -20,195 +20,194 @@ gh: infra-core repository {
 }
 
 pull_request: Pull Request {
-    icon: ./icons/github/pull-request.svg
-    shape: image
-}  
+  icon: ./icons/github/pull-request.svg
+  shape: image
+}
 
 gcp: Google Cloud {
-    icon: ./icons/gcp/logo.svg
+  icon: ./icons/gcp/logo.svg
+  style: {
+    stroke: "#000000"
+    fill: "#f1f3f4"
+  }
+
+  cert: Cloud Cert-Manager {
+    icon: ./icons/gcp/certificate_manager.svg
+    shape: image
+  }
+
+  dns: Cloud DNS {
+    icon: ./icons/gcp/cloud_dns.svg
+    shape: image
+  }
+
+  folder_scienceplatform: ph-SciencePlatform {
+    icon: ./icons/gcp/folder.svg
     style: {
-      stroke: "#000000"
-      fill: "#f1f3f4"
+      stroke: "#ffffff"
+      fill: "#e1f6fe"
     }
 
-    cert: Cloud Cert-Manager {
-        icon: ./icons/gcp/certificate_manager.svg
-        shape: image
-    }
-
-    dns: Cloud DNS {
-        icon: ./icons/gcp/cloud_dns.svg
-        shape: image
-    }
-
-    folder_scienceplatform: ph-SciencePlatform {
-        icon: ./icons/gcp/folder.svg
-        style: {
+    project_scienceplatform: ph-SciencePlatform {
+      icon: ./icons/gcp/project.svg
+      style: {
         stroke: "#ffffff"
         fill: "#e1f6fe"
+      }
+
+      ci_cd: CI/CD {
+        style: {
+          stroke: blue
+          font-color: blue
+          fill: transparent
         }
 
-        project_scienceplatform: ph-SciencePlatform {
-            icon: ./icons/gcp/project.svg
+        cloud_build: Cloud Build {
+          icon: ./icons/gcp/cloud_build.svg
+          shape: image
+        }
+
+        registry: Artifact Registry {
+          icon: ./icons/gcp/artifact_registry.svg
+          shape: image
+        }
+      }
+
+      vpc: VPC - 10.162.0.0/20 {
+        icon: ./icons/gcp/virtual_private_cloud.svg
+        style: {
+          stroke: blue
+          font-color: blue
+          stroke-dash: 3
+          fill: transparent
+        }
+
+        fw: Firewall {
+          icon: ./icons/gcp/cloud_firewall_rules.svg
+          style: {
+            stroke: black
+            font-color: black
+            stroke-dash: 3
+            fill: transparent
+          }
+
+          k8s: GKE Autopilot Cluster {
+            icon: ./icons/gcp/anthos_service_mesh.svg
             style: {
-            stroke: "#ffffff"
-            fill: "#e1f6fe"
+              stroke: blue
+              font-color: blue
+              fill: transparent
+            }
+            xrds: Cluster Scoped XRDs {
+              icon: ./icons/kubernetes/crd.svg
+              shape: image
             }
 
-            ci_cd: CI/CD {
-                style: {
-                  stroke: blue
-                  font-color: blue
-                  fill: transparent
-                }
-      
-                cloud_build: Cloud Build {
-                  icon: ./icons/gcp/cloud_build.svg
-                  shape: image
-                }
-      
-                registry: Artifact Registry {
-                  icon: ./icons/gcp/artifact_registry.svg
-                  shape: image
-                }
+            flux_system: flux-system {
+              icon: ./icons/kubernetes/ns.svg
+              style: {
+                stroke: brown
+                stroke-dash: 10
+                font-color: blue
+                fill: transparent
+              }
+
+              flux: Flux GitOps controllers {
+                icon: ./icons/flux/logo.svg
+                shape: image
+              }
             }
 
-            vpc: VPC - 10.162.0.0/20 {
-                icon: ./icons/gcp/virtual_private_cloud.svg
-                style: {
-                    stroke: blue
-                    font-color: blue
-                    stroke-dash: 3
-                    fill: transparent
-                }
+            crossplane_system: crossplane-system {
+              icon: ./icons/kubernetes/ns.svg
+              style: {
+                stroke: brown
+                stroke-dash: 10
+                font-color: blue
+                fill: transparent
+              }
 
-                fw: Firewall {
-                    icon: ./icons/gcp/cloud_firewall_rules.svg
-                    style: {
-                    stroke: black
-                    font-color: black
-                    stroke-dash: 3
-                    fill: transparent
-                    }
-
-                    k8s: GKE Autopilot Cluster {
-                        icon: ./icons/gcp/anthos_service_mesh.svg
-                        style: {
-                            stroke: blue
-                            font-color: blue
-                            fill: transparent
-                        }
-                        xrds: Cluster Scoped XRDs {
-                            icon: ./icons/kubernetes/crd.svg
-                            shape: image
-                        }
-
-                        flux_system: flux-system {
-                            icon: ./icons/kubernetes/ns.svg
-                            style: {
-                            stroke: brown
-                            stroke-dash: 10
-                            font-color: blue
-                            fill: transparent
-                            }
-
-                            flux: Flux GitOps controllers {
-                                icon: ./icons/flux/logo.svg
-                                shape: image
-                            }
-                        }
-
-                        crossplane_system: crossplane-system {
-                            icon: ./icons/kubernetes/ns.svg
-                            style: {
-                            stroke: brown
-                            stroke-dash: 10
-                            font-color: blue
-                            fill: transparent
-                            }
-
-                            crossplane: Crossplane controllers / provider {
-                                icon: ./icons/crossplane/logo.png
-                                shape: image
-                            }
-                        }
-
-                        backstage: backstage {
-                            icon: ./icons/kubernetes/ns.svg
-                            style: {
-                            stroke: brown
-                            stroke-dash: 10
-                            font-color: blue
-                            fill: transparent
-                            }
-
-                            deployment: Deployment {
-                                icon: ./icons/kubernetes/deploy.svg
-                                shape: image
-                            }
-
-                            ingress: Ingress {
-                                icon: ./icons/kubernetes/ing.svg
-                                shape: image
-                            }
-
-                            svc: Service {
-                                icon: ./icons/kubernetes/ing.svg
-                                shape: image
-                            }
-
-                        }
-                    }
-                }
+              crossplane: Crossplane controllers / provider {
+                icon: ./icons/crossplane/logo.png
+                shape: image
+              }
             }
+
+            backstage: backstage {
+              icon: ./icons/kubernetes/ns.svg
+              style: {
+                stroke: brown
+                stroke-dash: 10
+                font-color: blue
+                fill: transparent
+              }
+
+              deployment: Deployment {
+                icon: ./icons/kubernetes/deploy.svg
+                shape: image
+              }
+
+              ingress: Ingress {
+                icon: ./icons/kubernetes/ing.svg
+                shape: image
+              }
+
+              svc: Service {
+                icon: ./icons/kubernetes/ing.svg
+                shape: image
+              }
+            }
+          }
         }
+      }
+    }
+  }
+
+  folder_generic: phsp-xxxx {
+    icon: ./icons/gcp/folder.svg
+    style: {
+      stroke: "#ffffff"
+      fill: "#e1f6fe"
     }
 
-    folder_generic: phsp-xxxx {
-        icon: ./icons/gcp/folder.svg
-        style: {
+    project_generic: phsp-xxxx {
+      icon: ./icons/gcp/project.svg
+      style: {
         stroke: "#ffffff"
         fill: "#e1f6fe"
+      }
+
+      vpc: VPC - 10.162.0.0/20 {
+        icon: ./icons/gcp/virtual_private_cloud.svg
+        style: {
+          stroke: blue
+          font-color: blue
+          stroke-dash: 3
+          fill: transparent
         }
 
-        project_generic: phsp-xxxx {
-            icon: ./icons/gcp/project.svg
-            style: {
-            stroke: "#ffffff"
-            fill: "#e1f6fe"
-            }
-            vpc: VPC - 10.162.0.0/20 {
-                icon: ./icons/gcp/virtual_private_cloud.svg
-                style: {
-                    stroke: blue
-                    font-color: blue
-                    stroke-dash: 3
-                    fill: transparent
-                }
-    
-                fw: Firewall {
-                    icon: ./icons/gcp/cloud_firewall_rules.svg
-                    style: {
-                    stroke: black
-                    font-color: black
-                    stroke-dash: 3
-                    fill: transparent
-                    }
+        fw: Firewall {
+          icon: ./icons/gcp/cloud_firewall_rules.svg
+          style: {
+            stroke: black
+            font-color: black
+            stroke-dash: 3
+            fill: transparent
+          }
 
-                    vertexai_nb: Managed Notebook {
-                        icon: ./icons/gcp/vertexai.svg
-                        shape: image
-                    }
+          vertexai_nb: Managed Notebook {
+            icon: ./icons/gcp/vertexai.svg
+            shape: image
+          }
 
-                    bucket: Storage Bucket {
-                        icon: ./icons/gcp/cloud_storage.svg
-                        shape: image
-                    }
-
-                }
-            }
+          bucket: Storage Bucket {
+            icon: ./icons/gcp/cloud_storage.svg
+            shape: image
+          }
         }
-     }
+      }
+    }
+  }
 }
 
 devs -> pull_request: Creates PR using Claims / XRs
