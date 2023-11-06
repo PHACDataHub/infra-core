@@ -22,4 +22,5 @@ spec:
   values:
     args:
       - --enable-environment-configs
+      - --enable-usages
       - --debug
