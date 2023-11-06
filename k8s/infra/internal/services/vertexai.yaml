@@ -73,7 +73,6 @@ spec:
         apiVersion: dip.phac.gc.ca/v1beta1
         kind: XProject
         spec:
-          iamUser: "vedant.thapa@gcp.hc-sc.gc.ca"
           writeConnectionSecretToRef:
             namespace: crossplane-system
       patches:
@@ -223,7 +222,7 @@ spec:
       base:
         apiVersion: dip.phac.gc.ca/v1beta1
         kind: XNetwork
-        spec: {}
+        spec: {} 
       patches:
         # patch name
         - type: FromCompositeFieldPath
@@ -250,10 +249,14 @@ spec:
         - type: ToCompositeFieldPath
           fromFieldPath: status.networkId
           toFieldPath: status.xnetwork.networkId
+          policy:
+            fromFieldPath: Required
         # write subnetId
         - type: ToCompositeFieldPath
           fromFieldPath: status.subnetworkId
           toFieldPath: status.xnetwork.subnetworkId
+          policy:
+            fromFieldPath: Required
 
     - name: Bucket
       base:
@@ -324,7 +327,82 @@ spec:
               string:
                 type: Format
                 fmt: "%s-compute@developer.gserviceaccount.com"
-        # patch subnet
-        - type: FromCompositeFieldPath
-          fromFieldPath: status.xnetwork.subnetworkId
-          toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].subnet
+          policy:
+            fromFieldPath: Required
+        # # patch network
+        # - type: FromCompositeFieldPath
+        #   fromFieldPath: status.xnetwork.networkId
+        #   toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].network
+        #   policy:
+        #     fromFieldPath: Required
+        # # patch subnet
+        # - type: FromCompositeFieldPath
+        #   fromFieldPath: status.xnetwork.subnetworkId
+        #   toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].subnet
+        #   policy:
+        #     fromFieldPath: Required
+              
+    # specify dependencies for graceful deletion else project is deleted with dangling k8s resources
+    - name: providerconfig-uses-xproject
+      base:
+        apiVersion: apiextensions.crossplane.io/v1alpha1
+        kind: Usage
+        spec:
+          of:
+            apiVersion: dip.phac.gc.ca/v1beta1
+            kind: XProject
+            resourceSelector:
+              matchControllerRef: true
+          by:
+            apiVersion: gcp.upbound.io/v1beta1
+            kind: ProviderConfig
+            resourceSelector:
+              matchControllerRef: true
+
+    - name: XNetwork-uses-providerconfig
+      base:
+        apiVersion: apiextensions.crossplane.io/v1alpha1
+        kind: Usage
+        spec:
+          of:
+            apiVersion: gcp.upbound.io/v1beta1
+            kind: ProviderConfig
+            resourceSelector:
+              matchControllerRef: true
+          by:
+            apiVersion: dip.phac.gc.ca/v1beta1
+            kind: XNetwork
+            resourceSelector:
+              matchControllerRef: true
+
+    - name: Bucket-uses-providerconfig
+      base:
+        apiVersion: apiextensions.crossplane.io/v1alpha1
+        kind: Usage
+        spec:
+          of:
+            apiVersion: gcp.upbound.io/v1beta1
+            kind: ProviderConfig
+            resourceSelector:
+              matchControllerRef: true
+          by:
+            apiVersion: storage.gcp.upbound.io/v1beta1
+            kind: Bucket
+            resourceSelector:
+              matchControllerRef: true
+
+    - name: Notebook-uses-providerconfig
+      base:
+        apiVersion: apiextensions.crossplane.io/v1alpha1
+        kind: Usage
+        spec:
+          of:
+            apiVersion: gcp.upbound.io/v1beta1
+            kind: ProviderConfig
+            resourceSelector:
+              matchControllerRef: true
+          by:
+            apiVersion: notebooks.gcp.upbound.io/v1beta1
+            kind: Runtime
+            resourceSelector:
+              matchControllerRef: true
