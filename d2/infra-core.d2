@@ -73,6 +73,11 @@ gcp: Google Cloud {
         }
       }
 
+      service_account: management-sa Service Account {
+        icon: ./icons/gcp/identity_and_access_management.svg
+        shape: image
+      }
+
       vpc: VPC - 10.162.0.0/20 {
         icon: ./icons/gcp/virtual_private_cloud.svg
         style: {
@@ -98,7 +103,7 @@ gcp: Google Cloud {
               font-color: blue
               fill: transparent
             }
-            xrds: Cluster Scoped XRDs {
+            xrds: Cluster Scoped MRs {
               icon: ./icons/kubernetes/crd.svg
               shape: image
             }
@@ -168,6 +173,7 @@ gcp: Google Cloud {
     style: {
       stroke: "#ffffff"
       fill: "#e1f6fe"
+      multiple: true
     }
 
     project_generic: phsp-xxxx {
@@ -175,6 +181,17 @@ gcp: Google Cloud {
       style: {
         stroke: "#ffffff"
         fill: "#e1f6fe"
+        multiple: true
+      }
+
+      service_account: resourceprovisioner Service Account {
+        icon: ./icons/gcp/identity_and_access_management.svg
+        shape: image
+      }
+
+      apis: Cloud APIs {
+        icon: ./icons/gcp/cloud_apis.svg
+        shape: image
       }
 
       vpc: VPC - 10.162.0.0/20 {
@@ -210,25 +227,28 @@ gcp: Google Cloud {
   }
 }
 
-devs -> pull_request: Creates PR using Claims / XRs
+devs -> pull_request: creates PR using Claims / XRs
 pull_request -> gh
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system -> gcp.folder_generic: Provision folder, project and resources
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.xrds: Create Compositions / XRDs
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.xrds -> devs: Get Claims / XRs
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gh: Sync state
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system: Apply state
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage: Apply state
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> slack: Send reconciliation alerts
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.xrds: creates MRs via Compositions / XRDs
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.xrds -> devs: get Claims / XRs
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gh: sync state
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system: applies state
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage: applies state
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> slack: sends reconciliation alerts to
 
-internet -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress: HTTPS
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.cert: Get certs from
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.dns: Get domain from
+internet -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress: https
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.cert: get certs from
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.dns: get domain from
 gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.svc
 gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.svc -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment -> pull_request: Creates PR via software templates
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment -> pull_request: creates PR via software templates
 
-gh -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.cloud_build: Trigger
-gcp.folder_scienceplatform.project_scienceplatform.ci_cd.cloud_build -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.registry: Push
-gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.registry: Pull
+gh -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.cloud_build: triggers
+gcp.folder_scienceplatform.project_scienceplatform.ci_cd.cloud_build -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.registry: push
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.registry: pull
 
-gcp.folder_generic.project_generic.vpc.fw.vertexai_nb <-> gcp.folder_generic.project_generic.vpc.fw.bucket: Read/Write
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.xrds -> gcp.folder_scienceplatform.project_scienceplatform.service_account: uses
+gcp.folder_scienceplatform.project_scienceplatform.service_account -> gcp.folder_generic: to provision folder, project, service-account\nand enable cloud APIs
+gcp.folder_generic.project_generic.service_account -> gcp.folder_generic.project_generic.vpc: provision resources
+
+gcp.folder_generic.project_generic.vpc.fw.vertexai_nb <-> gcp.folder_generic.project_generic.vpc.fw.bucket: read/write
