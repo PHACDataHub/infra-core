@@ -1,0 +1,235 @@
+direction: down
+slack: Slack alerts\nchannel {
+  icon: ./icons/general/Slack_icon_2019.svg
+  shape: image
+}
+
+internet: The Internet {
+    icon: ./icons/gcp/my_cloud.svg
+    shape: image
+  }
+
+devs: Developers {
+  icon: ./icons/general/Developer_(94088)_-_The_Noun_Project.svg
+  shape: image
+}
+
+gh: infra-core repository {
+  icon: ./icons/github/logo.svg
+  shape: image
+}
+
+pull_request: Pull Request {
+    icon: ./icons/github/pull-request.svg
+    shape: image
+}  
+
+gcp: Google Cloud {
+    icon: ./icons/gcp/logo.svg
+    style: {
+      stroke: "#000000"
+      fill: "#f1f3f4"
+    }
+
+    cert: Cloud Cert-Manager {
+        icon: ./icons/gcp/certificate_manager.svg
+        shape: image
+    }
+
+    dns: Cloud DNS {
+        icon: ./icons/gcp/cloud_dns.svg
+        shape: image
+    }
+
+    folder_scienceplatform: ph-SciencePlatform {
+        icon: ./icons/gcp/folder.svg
+        style: {
+        stroke: "#ffffff"
+        fill: "#e1f6fe"
+        }
+
+        project_scienceplatform: ph-SciencePlatform {
+            icon: ./icons/gcp/project.svg
+            style: {
+            stroke: "#ffffff"
+            fill: "#e1f6fe"
+            }
+
+            ci_cd: CI/CD {
+                style: {
+                  stroke: blue
+                  font-color: blue
+                  fill: transparent
+                }
+      
+                cloud_build: Cloud Build {
+                  icon: ./icons/gcp/cloud_build.svg
+                  shape: image
+                }
+      
+                registry: Artifact Registry {
+                  icon: ./icons/gcp/artifact_registry.svg
+                  shape: image
+                }
+            }
+
+            vpc: VPC - 10.162.0.0/20 {
+                icon: ./icons/gcp/virtual_private_cloud.svg
+                style: {
+                    stroke: blue
+                    font-color: blue
+                    stroke-dash: 3
+                    fill: transparent
+                }
+
+                fw: Firewall {
+                    icon: ./icons/gcp/cloud_firewall_rules.svg
+                    style: {
+                    stroke: black
+                    font-color: black
+                    stroke-dash: 3
+                    fill: transparent
+                    }
+
+                    k8s: GKE Autopilot Cluster {
+                        icon: ./icons/gcp/anthos_service_mesh.svg
+                        style: {
+                            stroke: blue
+                            font-color: blue
+                            fill: transparent
+                        }
+                        xrds: Cluster Scoped XRDs {
+                            icon: ./icons/kubernetes/crd.svg
+                            shape: image
+                        }
+
+                        flux_system: flux-system {
+                            icon: ./icons/kubernetes/ns.svg
+                            style: {
+                            stroke: brown
+                            stroke-dash: 10
+                            font-color: blue
+                            fill: transparent
+                            }
+
+                            flux: Flux GitOps controllers {
+                                icon: ./icons/flux/logo.svg
+                                shape: image
+                            }
+                        }
+
+                        crossplane_system: crossplane-system {
+                            icon: ./icons/kubernetes/ns.svg
+                            style: {
+                            stroke: brown
+                            stroke-dash: 10
+                            font-color: blue
+                            fill: transparent
+                            }
+
+                            crossplane: Crossplane controllers / provider {
+                                icon: ./icons/crossplane/logo.png
+                                shape: image
+                            }
+                        }
+
+                        backstage: backstage {
+                            icon: ./icons/kubernetes/ns.svg
+                            style: {
+                            stroke: brown
+                            stroke-dash: 10
+                            font-color: blue
+                            fill: transparent
+                            }
+
+                            deployment: Deployment {
+                                icon: ./icons/kubernetes/deploy.svg
+                                shape: image
+                            }
+
+                            ingress: Ingress {
+                                icon: ./icons/kubernetes/ing.svg
+                                shape: image
+                            }
+
+                            svc: Service {
+                                icon: ./icons/kubernetes/ing.svg
+                                shape: image
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    folder_generic: phsp-xxxx {
+        icon: ./icons/gcp/folder.svg
+        style: {
+        stroke: "#ffffff"
+        fill: "#e1f6fe"
+        }
+
+        project_generic: phsp-xxxx {
+            icon: ./icons/gcp/project.svg
+            style: {
+            stroke: "#ffffff"
+            fill: "#e1f6fe"
+            }
+            vpc: VPC - 10.162.0.0/20 {
+                icon: ./icons/gcp/virtual_private_cloud.svg
+                style: {
+                    stroke: blue
+                    font-color: blue
+                    stroke-dash: 3
+                    fill: transparent
+                }
+    
+                fw: Firewall {
+                    icon: ./icons/gcp/cloud_firewall_rules.svg
+                    style: {
+                    stroke: black
+                    font-color: black
+                    stroke-dash: 3
+                    fill: transparent
+                    }
+
+                    vertexai_nb: Managed Notebook {
+                        icon: ./icons/gcp/vertexai.svg
+                        shape: image
+                    }
+
+                    bucket: Storage Bucket {
+                        icon: ./icons/gcp/cloud_storage.svg
+                        shape: image
+                    }
+
+                }
+            }
+        }
+     }
+}
+
+devs -> pull_request: Creates PR using Claims / XRs
+pull_request -> gh
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system -> gcp.folder_generic: Provision folder, project and resources
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.xrds: Create Compositions / XRDs
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.xrds -> devs: Get Claims / XRs
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gh: Sync state
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.crossplane_system: Apply state
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage: Apply state
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.flux_system -> slack: Send reconciliation alerts
+
+internet -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress: HTTPS
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.cert: Get certs from
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.dns: Get domain from
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.ingress -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.svc
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.svc -> gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment -> pull_request: Creates PR via software templates
+
+gh -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.cloud_build: Trigger
+gcp.folder_scienceplatform.project_scienceplatform.ci_cd.cloud_build -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.registry: Push
+gcp.folder_scienceplatform.project_scienceplatform.vpc.fw.k8s.backstage.deployment -> gcp.folder_scienceplatform.project_scienceplatform.ci_cd.registry: Pull
+
+gcp.folder_generic.project_generic.vpc.fw.vertexai_nb <-> gcp.folder_generic.project_generic.vpc.fw.bucket: Read/Write
