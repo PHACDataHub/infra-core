@@ -9,8 +9,8 @@ spec:
     name: main-trigger
     description: Cloud build trigger for main branch of the repo
     location: northamerica-northeast1
-    ignoredFiles:
-      - k8s/**
+    includedFiles:
+      - backstage/**
     includeBuildLogs: INCLUDE_BUILD_LOGS_WITH_STATUS
     github:
       # need to manually connect repo to cloud build via console
