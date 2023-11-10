@@ -1,0 +1,32 @@
+steps:
+  - id: 'generate-image-name'
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    dir: backstage
+    args:
+      - '-c'
+      - |
+        echo "northamerica-northeast1-docker.pkg.dev/${PROJECT_ID}/backstage/backstage:$BRANCH_NAME-$SHORT_SHA-$(date +%s)" > /workspace/imagename
+
+  - id: 'build image'
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    dir: backstage
+    args:
+      - '-c'
+      - |
+        image=$(cat /workspace/imagename)
+        echo $image
+        docker build -t $image .
+    env:
+      - 'DOCKER_BUILDKIT=1'
+
+  - id: 'push image'
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    dir: backstage
+    args:
+      - '-c'
+      - |
+        image=$(cat /workspace/imagename)
+        docker push $image
