@@ -1,0 +1,50 @@
+app:
+  title: PHAC Internal Data Hub
+  baseUrl: ${URL}
+
+organization:
+  name: PHACDataHub
+
+backend:
+  baseUrl: ${URL}
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+  cache:
+    store: memory
+
+auth:
+  # see https://backstage.io/docs/auth/ to learn about auth providers
+  providers: 
+    google:
+      development:
+        clientId: ${AUTH_GOOGLE_CLIENT_ID}
+        clientSecret: ${AUTH_GOOGLE_CLIENT_SECRET}
+
+catalog:
+  rules:
+    - allow: [Component, System, API, Resource, Location]
+  locations:
+    # example data
+    - type: url
+      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/examples/entities.yaml 
+
+    # example template
+    - type: url
+      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/examples/template/template.yaml
+      rules:
+        - allow: [Template]
+
+    # example organizational data
+    - type: url
+      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/examples/org.yaml
+      rules:
+        - allow: [User, Group]
+
+# default configuration is required else it causes a validation error
+techdocs:
+  builder: 'local' # Alternatives - 'external'
+  generator:
+    runIn: 'docker' # Alternatives - 'local'
+  publisher:
+    type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
