@@ -22,7 +22,7 @@ spec:
               containerPort: 7007
           envFrom:
             - secretRef:
-                name: github-secrets
+                name: google-secrets
           env:
             - name: URL
               value: 'https://backstage.phac.alpha.canada.ca'
