@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backstage
+  annotations:
+    kubernetes.io/ingress.class: 'gce'
+    kubernetes.io/ingress.global-static-ip-name: backstage-ip
+    networking.gke.io/managed-certificates: backstage-certificate
+    networking.gke.io/v1beta1.FrontendConfig: backstage-ingress-security-config
+  labels:
+    app: backstage
+  namespace: backstage
+spec:
+  rules:
+    - host: 'backstage.phac.alpha.canada.ca'
+      http:
+        paths:
+          - backend:
+              service:
+                name: backstage
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: backstage-ingress-security-config
+  namespace: backstage
+spec:
+  sslPolicy: gke-ingress-ssl-policy
+  redirectToHttps:
+    enabled: true
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: backstage-certificate
+  namespace: backstage
+spec:
+  domains:
+    - backstage.phac.alpha.canada.ca
