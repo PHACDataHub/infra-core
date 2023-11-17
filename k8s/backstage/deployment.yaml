@@ -13,7 +13,6 @@ spec:
       labels:
         app: backstage
     spec:
-      serviceAccountName: backstage
       containers:
         - name: backstage
           image: northamerica-northeast1-docker.pkg.dev/php-01hdpgnv25h/backstage/backstage:main-bc2d5d3-1699631088 # {"$imagepolicy": "flux-system:backstage"}
