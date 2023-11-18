@@ -1,11 +1,11 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: istio-system
+  name: istio-system-crds
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./k8s/istio-system
+  path: ./k8s/istio-system/crds
   prune: true
   wait: true
   sourceRef:
@@ -17,3 +17,20 @@ spec:
         name: istio-version
   dependsOn:
     - name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: istio-system
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./k8s/istio-system
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: istio-system-crds
+
