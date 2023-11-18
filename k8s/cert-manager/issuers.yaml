@@ -1,0 +1,13 @@
+# Letsencrypt Production
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    solvers: []
+    preferredChain: ""
+    # Letsencrypt Production
+    privateKeySecretRef:
+      name: letsencrypt
+    server: https://acme-v02.api.letsencrypt.org/directory

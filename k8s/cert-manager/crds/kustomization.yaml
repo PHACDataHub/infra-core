@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- cert-manager.yaml
+patches:
+- target:
+    group: helm.toolkit.fluxcd.io
+    version: v2beta1
+    kind: HelmRelease
+    name: cert-manager
+    namespace: cert-manager
+  patch: |-
+    - op: add
+      path: /spec/values/serviceAccount
+      value:
+        annotations:
+          iam.gke.io/gcp-service-account: dns01-solver@php-01hdpgnv25h.iam.gserviceaccount.com
