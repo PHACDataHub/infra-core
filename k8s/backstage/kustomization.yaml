@@ -4,4 +4,4 @@ resources:
   - ns.yaml
   - sealed-secret.yaml
   - deployment.yaml
-  - ingress.yaml
+  - virtual-service.yaml

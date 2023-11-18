@@ -11,7 +11,7 @@ spec:
     kind: GitRepository
     name: flux-system
   dependsOn:
-    - name: crossplane-system
+    - name: cert-manager
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta1
 kind: ImageRepository

@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: backstage
+  namespace: backstage
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - istio-system/public-gateway
+  http:
+  - name: gateway-to-server
+    match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: backstage.backstage.svc.cluster.local
