@@ -3,3 +3,14 @@ kind: Kustomization
 resources:
 - ns.yaml
 - istio.yaml
+patches:
+- target:
+    group: helm.toolkit.fluxcd.io
+    version: v2beta1
+    kind: HelmRelease
+    name: istio-gateway
+    namespace: istio-system
+  patch: |-
+    - op: add
+      path: /spec/values/service/loadBalancerIP
+      value: 35.203.22.146
