@@ -14,7 +14,7 @@ patches:
   patch: |-
     - op: add
       path: /spec/dnsNames/-
-      value: "*.backstage.phac.alpha.canada.ca"
+      value: "backstage.phac.alpha.canada.ca"
 
 - target:
     group: cert-manager.io
