@@ -77,3 +77,5 @@ spec:
   values:
     service:
       type: "${service:=LoadBalancer}"
+      loadBalancerIP: 34.118.166.17
+
