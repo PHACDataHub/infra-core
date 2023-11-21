@@ -5,7 +5,7 @@ metadata:
   title: VertexAI + Cloud Storage Template
   description: Template for the scaffolder to submit a pull-request for provisioning a VertexAI Managed Notebook and Cloud Storage bucket in a new project space.
 spec:
-  owner: user:guest
+  owner: infra-core
   type: service
 
   # These parameters are used to generate the input form in the frontend, and are
