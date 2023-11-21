@@ -1,0 +1,7 @@
+apiVersion: dip.phac.gc.ca/v1beta1
+kind: XVertexAI
+metadata:
+  name: ${{ values.name | dump }}
+spec:
+  name: ${{ values.name | dump }}
+  iamUser: ${{ values.iamUser | dump }}

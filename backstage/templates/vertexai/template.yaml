@@ -1,0 +1,93 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: vertex-ai
+  title: VertexAI + Cloud Storage Template
+  description: Template for the scaffolder to submit a pull-request for provisioning a VertexAI Managed Notebook and Cloud Storage bucket in a new project space.
+spec:
+  owner: user:guest
+  type: service
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Fill in some steps
+      required:
+        - name
+        - iamUser
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Name of the project
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        iamUser:
+          title: GCP Email
+          type: string
+          description: Owner's GCP email address
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        ipCidrRange:
+          title: IP CIDR Range
+          type: string
+          description: IP CIDR Range for the VPC
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+          default: "10.162.0.0/20"
+        region:
+          title: Region
+          type: string
+          description: Region that resources should be provisioned 
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+          default: northamerica-northeast1
+        description:
+          title: Description
+          type: string
+          description: Description for the Pull Request
+          ui:widget: textarea
+          ui:options:
+            rows: 10
+          ui:autofocus: true
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        targetPath: ./content
+        values:
+          name: ${{ parameters.name }}
+          iamUser: ${{ parameters.iamUser }}
+          ipCidrRange: ${{ parameters.ipCidrRange }}
+          region: ${{ parameters.region }}
+          description: ${{ parameters.description }}
+
+    # This step publishes the contents of the working directory to GitHub.
+    - id: open-pr
+      name: Open PR in GitOps Repository
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?repo=infra-core&owner=PHACDataHub
+        branchName: xvertexai-${{ parameters.name }}
+        title: '[backstage-bot] Create XVertexAI-${{ parameters.name }}'
+        description: |
+          ${{ parameters.description if parameters.description }}
+        sourcePath: content
+        targetPath: k8s/gcp-resources/xr
+        update: true
+ 
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: Go to Pull Request
+        url: ${{ steps.open-pr.output.remoteUrl }}
