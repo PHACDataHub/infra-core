@@ -1,0 +1,38 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: infra-core
+  description: PHAC backstage instance to manage infrastructure and repositories
+  # Example for optional annotations
+  annotations:
+    google.com/cloudbuild-project-slug: php-01hdpgnv25h
+    github.com/project-slug: PHACDataHub/infra-core
+  #   backstage.io/techdocs-ref: dir:.
+spec:
+  type: service
+  owner: group:platform-team
+  lifecycle: experimental
+  system: platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: platform
+spec:
+  owner: group:platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: infra-admin
+spec:
+  memberOf: [platform-team]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: platform-team
+spec:
+  type: team
+  children: []
+
