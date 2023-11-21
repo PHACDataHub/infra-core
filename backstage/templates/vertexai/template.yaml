@@ -52,7 +52,7 @@ spec:
           description: Description for the Pull Request
           ui:widget: textarea
           ui:options:
-            rows: 10
+            rows: 5
           ui:autofocus: true
 
   # These steps are executed in the scaffolder backend, using data that we gathered
