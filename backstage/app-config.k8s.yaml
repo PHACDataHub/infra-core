@@ -53,3 +53,14 @@ techdocs:
     runIn: 'docker' # Alternatives - 'local'
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+
+kubernetes:
+  serviceLocatorMethod:
+    type: 'multiTenant'
+  clusterLocatorMethods:
+    - type: 'gke'
+      projectId: 'php-01hdpgnv25h'
+      skipTLSVerify: true 
+      skipMetricsLookup: true
+      exposeDashbord: true
+
