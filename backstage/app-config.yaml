@@ -130,3 +130,8 @@ kubernetes:
           skipMetricsLookup: true
           serviceAccountToken: ${K8S_ACCESS_TOKEN}
           caData: ${K8S_CA_DATA}
+    - type: 'gke'
+      projectId: 'php-01hdpgnv25h'
+      skipTLSVerify: true 
+      skipMetricsLookup: true
+      exposeDashbord: true
