@@ -4,6 +4,8 @@ kind: HelmRepository
 metadata:
   name: crossplane-stable
   namespace: flux-system
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 2h0m0s
   url: https://charts.crossplane.io/stable
