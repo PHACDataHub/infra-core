@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app: backstage
+        backstage.io/kubernetes-id: infra-core
     spec:
       serviceAccountName: backstage
       containers:
