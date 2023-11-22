@@ -5,3 +5,4 @@ resources:
 - gotk-sync.yaml
 - sealed-secrets.yaml
 - istio-version.yaml
+- gcr-sync.yaml
