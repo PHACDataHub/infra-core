@@ -58,9 +58,10 @@ kubernetes:
   serviceLocatorMethod:
     type: 'multiTenant'
   clusterLocatorMethods:
-    - type: 'gke'
-      projectId: 'php-01hdpgnv25h'
-      skipTLSVerify: true 
-      skipMetricsLookup: true
-      exposeDashbord: true
-
+    - type: 'config'
+      clusters:
+        - url: kubernetes.default.svc.cluster.local:443
+          name: management-auto
+          authProvider: 'serviceAccount'
+          skipTLSVerify: true
+          skipMetricsLookup: false

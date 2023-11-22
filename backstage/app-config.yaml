@@ -1,9 +1,9 @@
 app:
-  title: Scaffolded Backstage App
+  title: PHAC Internal Data Hub
   baseUrl: http://localhost:3000
 
 organization:
-  name: My Company
+  name: PHACDataHub
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
@@ -121,17 +121,33 @@ kubernetes:
   serviceLocatorMethod:
     type: 'multiTenant'
   clusterLocatorMethods:
+    # Manually discover cluster and authenticate via serviceaccount
     - type: 'config'
       clusters:
         - url: ${K8S_API_ENDPOINT}
           name: management-auto
           authProvider: 'serviceAccount'
-          skipTLSVerify: true
-          skipMetricsLookup: true
+          skipTLSVerify: false
+          skipMetricsLookup: false
           serviceAccountToken: ${K8S_ACCESS_TOKEN}
           caData: ${K8S_CA_DATA}
-    - type: 'gke'
-      projectId: 'php-01hdpgnv25h'
-      skipTLSVerify: true 
-      skipMetricsLookup: true
-      exposeDashbord: true
+    # # Automatically discover cluster in the specified project 
+    # # and authenticate via user credentials
+    # - type: 'gke'
+    #   projectId: 'php-01hdpgnv25h'
+    #   skipTLSVerify: true 
+    #   skipMetricsLookup: false
+    #   exposeDashbord: true
+    # # Manually discover cluster and authenticate via user credentials
+    # - type: 'config'
+    #   clusters:
+    #     - url: ${K8S_API_ENDPOINT}
+    #       name: management-auto
+    #       authProvider: 'google'
+    #       skipTLSVerify: false
+    #       skipMetricsLookup: false
+    #       caData: ${K8S_CA_DATA}
+  customResources:
+    - group: "cloudplatform.gcp.upbound.io"
+      apiVersion: "v1beta1"
+      plural: "serviceaccountiammembers"
