@@ -61,6 +61,17 @@ import {
   EntityCloudbuildContent,
   isCloudbuildAvailable
 } from '@backstage/plugin-cloudbuild';
+import { EntityKubernetesContent } from '@backstage/plugin-kubernetes';
+import {
+  EntityFluxGitRepositoriesCard,
+  EntityFluxHelmReleasesCard,
+  EntityFluxOCIRepositoriesCard,
+  EntityFluxKustomizationsCard,
+  EntityFluxHelmRepositoriesCard,
+  EntityFluxDeploymentsCard,
+  EntityFluxSourcesCard,
+  EntityFluxImagePoliciesCard,
+} from '@weaveworksoss/backstage-plugin-flux';
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -165,6 +176,39 @@ const serviceEntityPage = (
         </Grid>
         <Grid item md={6}>
           <EntityConsumedApisCard />
+        </Grid>
+      </Grid>
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/kubernetes" title="Kubernetes">
+      <EntityKubernetesContent refreshIntervalMs={30000} />
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/weaveworks-flux" title="Flux">
+      <Grid container spacing={3} alignItems="stretch">
+        <Grid item md={12}>
+          <EntityFluxHelmReleasesCard />
+        </Grid>
+        <Grid item md={12}>
+          <EntityFluxKustomizationsCard />
+        </Grid>
+        <Grid item md={12}>
+          <EntityFluxHelmRepositoriesCard />
+        </Grid>
+        <Grid item md={12}>
+          <EntityFluxGitRepositoriesCard />
+        </Grid>
+        <Grid item md={12}>
+          <EntityFluxOCIRepositoriesCard />
+        </Grid>
+        <Grid item md={12}>
+          <EntityFluxDeploymentsCard />
+        </Grid>
+        <Grid item md={12}>
+          <EntityFluxSourcesCard />
+        </Grid>
+        <Grid item md={12}>
+          <EntityFluxImagePoliciesCard />
         </Grid>
       </Grid>
     </EntityLayout.Route>
