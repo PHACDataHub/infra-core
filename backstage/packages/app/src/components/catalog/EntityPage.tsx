@@ -56,7 +56,7 @@ import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 import {
   EntityCloudbuildContent,
   isCloudbuildAvailable
-} from '@backstage/plugin-cloudbuild';
+} from 'backstage-plugin-cloudbuild';
 import { EntityKubernetesContent } from '@backstage/plugin-kubernetes';
 import {
   EntityFluxGitRepositoriesCard,

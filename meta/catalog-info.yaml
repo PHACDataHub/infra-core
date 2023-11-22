@@ -5,6 +5,7 @@ metadata:
   description: PHAC backstage instance to manage infrastructure and repositories
   # Example for optional annotations
   annotations:
+    google.com/cloudbuild-location: northamerica-northeast1
     google.com/cloudbuild-project-slug: php-01hdpgnv25h
     github.com/project-slug: PHACDataHub/infra-core
     backstage.io/kubernetes-id: infra-core
