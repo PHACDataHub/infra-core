@@ -9,6 +9,8 @@ kind: HelmRepository
 metadata:
   name: cert-manager
   namespace: cert-manager
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 1m
   url: https://charts.jetstack.io
@@ -18,6 +20,8 @@ kind: HelmRelease
 metadata:
   name: cert-manager
   namespace: cert-manager
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 1m
   chart:

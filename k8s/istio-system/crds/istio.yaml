@@ -5,6 +5,7 @@ metadata:
   namespace: istio-system
   labels:
     app.kubernetes.io/part-of: istio
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 1h0m0s
   url: https://istio-release.storage.googleapis.com/charts
@@ -16,6 +17,7 @@ metadata:
   namespace: istio-system
   labels:
     app.kubernetes.io/part-of: istio
+    backstage.io/kubernetes-id: infra-core
 spec:
   releaseName: istio-base
   install:
@@ -38,6 +40,7 @@ metadata:
   namespace: istio-system
   labels:
     app.kubernetes.io/part-of: istio
+    backstage.io/kubernetes-id: infra-core
 spec:
   releaseName: istiod
   dependsOn:
@@ -61,6 +64,7 @@ metadata:
   namespace: istio-system
   labels:
     app.kubernetes.io/part-of: istio
+    backstage.io/kubernetes-id: infra-core
 spec:
   releaseName: istio-gateway
   dependsOn:
