@@ -3,6 +3,8 @@ kind: Kustomization
 metadata:
   name: istio-system-crds
   namespace: flux-system
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 10m0s
   path: ./k8s/istio-system/crds
@@ -23,6 +25,8 @@ kind: Kustomization
 metadata:
   name: istio-system
   namespace: flux-system
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 10m0s
   path: ./k8s/istio-system

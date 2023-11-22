@@ -4,6 +4,8 @@ kind: Kustomization
 metadata:
   name: crossplane-system-crds
   namespace: flux-system
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 2m0s
   path: ./k8s/crossplane-system/crds
@@ -20,6 +22,8 @@ kind: Kustomization
 metadata:
   name: crossplane-system-providers
   namespace: flux-system
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 2m0s
   path: ./k8s/crossplane-system/providers
@@ -62,6 +66,8 @@ kind: Kustomization
 metadata:
   name: crossplane-system
   namespace: flux-system
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   interval: 2m0s
   path: ./k8s/crossplane-system
