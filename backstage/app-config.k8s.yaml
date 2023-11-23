@@ -14,33 +14,22 @@ backend:
     store: memory
 
 auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
   providers: 
     google:
       development:
         clientId: ${AUTH_GOOGLE_CLIENT_ID}
         clientSecret: ${AUTH_GOOGLE_CLIENT_SECRET}
 
+integrations:
+  github:
+    - host: github.com
+      apps:
+        - $include: secret/github-app-backstage-phac-credentials.yaml
+ 
 catalog:
   rules:
     - allow: [Component, System, API, Resource, Location]
   locations:
-    # example data
-    - type: url
-      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/examples/entities.yaml 
-
-    # example template
-    - type: url
-      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/examples/template/template.yaml
-      rules:
-        - allow: [Template]
-
-    # example organizational data
-    - type: url
-      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/examples/org.yaml
-      rules:
-        - allow: [User, Group]
-
     - type: url
       target: https://github.com/PHACDataHub/infra-core/blob/main/meta/catalog-info.yaml
       rules:
@@ -48,11 +37,11 @@ catalog:
 
 # default configuration is required else it causes a validation error
 techdocs:
-  builder: 'local' # Alternatives - 'external'
+  builder: 'local' 
   generator:
-    runIn: 'docker' # Alternatives - 'local'
+    runIn: 'docker' 
   publisher:
-    type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+    type: 'local' 
 
 kubernetes:
   serviceLocatorMethod:
@@ -65,3 +54,7 @@ kubernetes:
           authProvider: 'serviceAccount'
           skipTLSVerify: true
           skipMetricsLookup: false
+  customResources:
+    - group: "dip.phac.gc.ca"
+      apiVersion: "v1beta1"
+      plural: "xvertexai"
