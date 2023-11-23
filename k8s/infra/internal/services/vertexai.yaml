@@ -35,6 +35,31 @@ spec:
                   type: string
                   description: Subnet region
                   default: northamerica-northeast1
+                notebookConfig:
+                  type: object
+                  properties:
+                    idleShutdownTimeout:
+                      type: number
+                      description: "Time in minutes to wait before shuting down runtime. Default: 180 minutes"
+                      default: 180
+                    machineType:
+                      type: string
+                      description: The Compute Engine machine type used for runtimes. Supports n1-standard or n1-highmem series. See https://cloud.google.com/compute/docs/general-purpose-machines#n1-standard for more info
+                      default: n1-standard-2
+                    diskType:
+                      type: string
+                      enum:
+                        - DISK_TYPE_UNSPECIFIED
+                        - PD_STANDARD
+                        - PD_SSD
+                        - PD_BALANCED
+                        - PD_EXTREME
+                      description: The type of the boot disk attached to this runtime, defaults to standard persistent disk.
+                      default: PD_STANDARD
+                    diskSizeGb:
+                      type: number
+                      description: Specifies the size of the disk in base-2 GB. If not specified, the disk will be the same size as the image (usually 10GB). If specified, the size must be equal to or larger than 10GB. Default 100 GB.
+                      default: 100
               required:
                 - name
                 - iamUser
@@ -66,6 +91,13 @@ spec:
   compositeTypeRef:
     apiVersion: dip.phac.gc.ca/v1beta1
     kind: XVertexAI
+  patchSets:
+  # patch labels
+  - name: label-patchset
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.labels
+      toFieldPath: metadata.labels
   resources:
 
     - name: XProject
@@ -302,7 +334,7 @@ spec:
                       - initializeParams:
                           - diskSizeGb: 100
                             diskType: PD_STANDARD
-                    machineType: n1-standard-1
+                    machineType: n1-standard-2
           providerConfigRef: {}
       patches:
         # patch ProviderConfig 
@@ -318,6 +350,22 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.region
           toFieldPath: spec.forProvider.location
+        # patch diskType 
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.notebookConfig.diskType
+          toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].dataDisk[0].initializeParams[0].diskType
+        # patch diskSizeGb 
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.notebookConfig.diskSizeGb
+          toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].dataDisk[0].initializeParams[0].diskSizeGb
+        # patch machineType 
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.notebookConfig.machineType
+          toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].machineType
+        # patch idleShutdownTimeout 
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.notebookConfig.idleShutdownTimeout
+          toFieldPath: spec.forProvider.softwareConfig[0].idleShutdownTimeout
         # patch runtimeOwner 
         - type: FromCompositeFieldPath
           fromFieldPath: status.xproject.projectNumber
