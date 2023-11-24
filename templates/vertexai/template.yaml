@@ -132,8 +132,10 @@ spec:
         update: true
         reviewers:
           - vedantthapa
- 
+
   output:
     links:
-      - title: Go to Pull Request
-        url: ${{ steps.publish-pr.output.remoteUrl }}
+      - title: View Pull Request on GitHub
+        url: ${{ steps['publish-pr'].output.remoteUrl }}
+      - title: View Kubernetes Status
+        url: "https://backstage.phac.alpha.canada.ca/catalog/default/component/infra-core/kubernetes"
