@@ -2,6 +2,8 @@ apiVersion: dip.phac.gc.ca/v1beta1
 kind: XVertexAI
 metadata:
   name: "tbproject"
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   name: "tbproject"
   iamUser: "vedant.thapa@gcp.hc-sc.gc.ca"
