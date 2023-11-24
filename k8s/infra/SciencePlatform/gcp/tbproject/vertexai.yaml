@@ -1,0 +1,14 @@
+apiVersion: dip.phac.gc.ca/v1beta1
+kind: XVertexAI
+metadata:
+  name: "tbproject"
+spec:
+  name: "tbproject"
+  iamUser: 
+  ipCidrRange: "10.162.0.0/20"
+  region: "northamerica-northeast1"
+  notebookConfig:
+    idleShutdownTimeout: 180
+    machineType: "n1-standard-2"
+    diskType: "PD_STANDARD"
+    diskSizeGb: 100
