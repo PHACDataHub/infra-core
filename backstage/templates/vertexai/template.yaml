@@ -109,7 +109,7 @@ spec:
         targetPath: ./content
         values:
           name: ${{ parameters.name }}
-          iamUser: ${{ user.entity.spec.profile.email }}
+          iamUser: ${{ parameters.iamUser }}
           ipCidrRange: ${{ parameters.ipCidrRange }}
           region: ${{ parameters.region }}
           idleShutdownTimeout: ${{ parameters.idleShutdownTimeout }}
