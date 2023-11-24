@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: backstage
   namespace: backstage
-  labels:
-    backstage.io/kubernetes-id: infra-core
 spec:
   replicas: 1
   selector:
@@ -14,7 +12,6 @@ spec:
     metadata:
       labels:
         app: backstage
-        backstage.io/kubernetes-id: infra-core
     spec:
       serviceAccountName: backstage
       containers:
@@ -40,6 +37,13 @@ spec:
               # using the minimum pod resources https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-resource-requests#compute-class-min-max
               cpu: 250m
               memory: 512Mi
+          volumeMounts:
+            - name: github-app
+              mountPath: /app/secret
+      volumes:
+        - name: github-app
+          secret:
+            secretName: github-app
 ---
 apiVersion: v1
 kind: Service

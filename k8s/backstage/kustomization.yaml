@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ns.yaml
   - rbac.yaml
-  - sealed-secret.yaml
+  - google-sealed.yaml
+  - github-app-sealed.yaml
   - deployment.yaml
   - virtual-service.yaml
