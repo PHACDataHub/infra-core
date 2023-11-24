@@ -34,6 +34,10 @@ catalog:
       target: https://github.com/PHACDataHub/infra-core/blob/main/meta/catalog-info.yaml
       rules:
         - allow: [User, Group, Component, System]
+    - type: url
+      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/templates/vertexai/template.yaml
+      rules:
+        - allow: [Template]
 
 # default configuration is required else it causes a validation error
 techdocs:
