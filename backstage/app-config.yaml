@@ -97,7 +97,7 @@ catalog:
 
     # Local example template
     - type: file
-      target: ../../examples/vertexai/template.yaml
+      target: ../../templates/vertexai/template.yaml
       rules:
         - allow: [Template]
 
@@ -116,22 +116,22 @@ kubernetes:
     type: 'multiTenant'
   clusterLocatorMethods:
     # Manually discover cluster and authenticate via serviceaccount
-    - type: 'config'
-      clusters:
-        - url: ${K8S_API_ENDPOINT}
-          name: management-auto
-          authProvider: 'serviceAccount'
-          skipTLSVerify: false
-          skipMetricsLookup: false
-          serviceAccountToken: ${K8S_ACCESS_TOKEN}
-          caData: ${K8S_CA_DATA}
+    # - type: 'config'
+    #   clusters:
+    #     - url: ${K8S_API_ENDPOINT}
+    #       name: management-auto
+    #       authProvider: 'serviceAccount'
+    #       skipTLSVerify: false
+    #       skipMetricsLookup: false
+    #       serviceAccountToken: ${K8S_ACCESS_TOKEN}
+    #       caData: ${K8S_CA_DATA}
     # # Automatically discover cluster in the specified project 
     # # and authenticate via user credentials
-    # - type: 'gke'
-    #   projectId: 'php-01hdpgnv25h'
-    #   skipTLSVerify: true 
-    #   skipMetricsLookup: false
-    #   exposeDashbord: true
+    - type: 'gke'
+      projectId: 'php-01hdpgnv25h'
+      skipTLSVerify: true 
+      skipMetricsLookup: false
+      exposeDashbord: true
     # # Manually discover cluster and authenticate via user credentials
     # - type: 'config'
     #   clusters:
