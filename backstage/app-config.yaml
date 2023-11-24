@@ -35,8 +35,7 @@ backend:
 integrations:
   github:
     - host: github.com
-      apps:
-        - $include: github-app-backstage-phac-credentials.yaml
+      token: ${GITHUB_TOKEN}
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
