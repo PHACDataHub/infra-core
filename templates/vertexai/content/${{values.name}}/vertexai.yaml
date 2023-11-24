@@ -2,6 +2,8 @@ apiVersion: dip.phac.gc.ca/v1beta1
 kind: XVertexAI
 metadata:
   name: ${{ values.name | dump }}
+  labels:
+    backstage.io/kubernetes-id: infra-core
 spec:
   name: ${{ values.name | dump }}
   iamUser: ${{ values.iamUser | dump }}
