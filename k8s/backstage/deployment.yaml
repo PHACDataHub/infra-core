@@ -16,7 +16,7 @@ spec:
       serviceAccountName: backstage
       containers:
         - name: backstage
-          image: northamerica-northeast1-docker.pkg.dev/php-01hdpgnv25h/backstage/backstage:main-4aa7f27-1700856952 # {"$imagepolicy": "flux-system:backstage"}
+          image: northamerica-northeast1-docker.pkg.dev/php-01hdpgnv25h/backstage/backstage:main-2bf29b4-1700858163 # {"$imagepolicy": "flux-system:backstage"}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
