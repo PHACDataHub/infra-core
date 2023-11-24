@@ -6,7 +6,7 @@ metadata:
     backstage.io/kubernetes-id: infra-core
 spec:
   name: "silly-test-project"
-  iamUser: "mike.williamson@gcp.hc-sc.gc.ca"
+  iamUser: "michael.williamson@gcp.hc-sc.gc.ca"
   ipCidrRange: "10.162.0.0/20"
   region: "northamerica-northeast1"
   notebookConfig:
