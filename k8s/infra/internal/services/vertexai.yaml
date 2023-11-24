@@ -35,6 +35,9 @@ spec:
                   type: string
                   description: Subnet region
                   default: northamerica-northeast1
+                  enum:
+                    - northamerica-northeast1
+                    - northamerica-northeast2
                 notebookConfig:
                   type: object
                   properties:
