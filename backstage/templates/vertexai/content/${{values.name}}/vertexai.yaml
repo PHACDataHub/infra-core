@@ -7,3 +7,8 @@ spec:
   iamUser: ${{ values.iamUser | dump }}
   ipCidrRange: ${{ values.ipCidrRange | dump }}
   region: ${{ values.region | dump }}
+  notebookConfig:
+    idleShutdownTimeout: ${{ values.idleShutdownTimeout | dump }}
+    machineType: ${{ values.machineType | dump }}
+    diskType: ${{ values.diskType| dump }}
+    diskSizeGb: ${{ values.diskSizeGb | dump }}

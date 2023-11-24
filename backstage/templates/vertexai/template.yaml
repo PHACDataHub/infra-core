@@ -11,49 +11,86 @@ spec:
   # These parameters are used to generate the input form in the frontend, and are
   # used to gather input data for the execution of the template.
   parameters:
-    - title: Fill in some steps
+    - title: Required parameters
       required:
         - name
         - iamUser
       properties:
         name:
-          title: Name
+          title: Project Name
           type: string
           description: Name of the project
           ui:autofocus: true
-          ui:options:
-            rows: 5
+          pattern: ^[a-z0-9-]+$
 
         iamUser:
           title: GCP Email
           type: string
-          description: Owner's GCP email address
+          description: GCP User to set as Owner for the project
           ui:autofocus: true
-          ui:options:
-            rows: 5
           pattern: ^[a-zA-Z0-9._%+-]+@gcp\.hc-sc\.gc\.ca$
+
+    - title: Optional Configurations
+      properties:
+        region:
+          title: Region
+          type: string
+          description: Geographic region where you want to provision resources
+          default: northamerica-northeast1
+          enum:
+            - northamerica-northeast1
+            - northamerica-northeast2
+          enumNames:
+            - Montréal (northamerica-northeast1)
+            - Toronto (northamerica-northeast2)
 
         ipCidrRange:
           title: IP CIDR Range
           type: string
           description: IP CIDR Range for the VPC
           ui:autofocus: true
-          ui:options:
-            rows: 5
           default: "10.162.0.0/20"
 
-        region:
-          title: Region
-          type: string
-          description: Region that resources should be provisioned 
-          default: northamerica-northeast1
-          enum:
-            - northamerica-northeast1
-            - northamerica-northeast2
-          enumNames:
-            - northamerica-northeast1
-            - northamerica-northeast2
+        idleShutdownTimeout:
+          title: Idle Shutdown Timeout
+          type: integer
+          description: Idle time in minutes to wait before shuting down VertexAI runtime
+          ui:autofocus: true
+          default: 180
 
+        machineType:
+          title: Compute instance
+          type: string
+          description: Compute instance type to use. See https://cloud.google.com/compute/docs/general-purpose-machines#n1-standard for valid values
+          ui:autofocus: true
+          default: n1-standard-2
+
+        diskType:
+          title: Disk Type
+          type: string
+          description: IP CIDR Range for the VPC
+          ui:autofocus: true
+          default: PD_STANDARD
+          enum:
+            - DISK_TYPE_UNSPECIFIED
+            - PD_STANDARD
+            - PD_SSD
+            - PD_BALANCED
+            - PD_EXTREME
+          enumNames:
+            - Disk type not set
+            - Standard persistent disk type
+            - SSD persistent disk type
+            - Balanced persistent disk type
+            - Extreme persistent disk type
+
+        diskSizeGb:
+          title: Disk Size
+          type: integer
+          description: Specifies the size of the disk in base-2 GB. If not specified, the disk will be the same size as the image (usually 10GB). If specified, the size must be equal to or larger than 10GB. 
+          ui:autofocus: true
+          default: 100
+          
         description:
           title: Description
           type: string
@@ -75,6 +112,10 @@ spec:
           iamUser: ${{ user.entity.spec.profile.email }}
           ipCidrRange: ${{ parameters.ipCidrRange }}
           region: ${{ parameters.region }}
+          idleShutdownTimeout: ${{ parameters.idleShutdownTimeout }}
+          machineType: ${{ parameters.machineType }}
+          diskType: ${{ parameters.diskType }}
+          diskSizeGb: ${{ parameters.diskSizeGb }}
           description: ${{ parameters.description }}
 
     - id: publish-pr
@@ -89,6 +130,8 @@ spec:
         sourcePath: content
         targetPath: k8s/infra/SciencePlatform/gcp/
         update: true
+        reviewers:
+          - vedantthapa
  
   output:
     links:
