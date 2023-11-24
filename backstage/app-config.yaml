@@ -97,7 +97,7 @@ catalog:
 
     # Local example template
     - type: file
-      target: ../../templates/vertexai/template.yaml
+      target: ../../../templates/vertexai/template.yaml
       rules:
         - allow: [Template]
 

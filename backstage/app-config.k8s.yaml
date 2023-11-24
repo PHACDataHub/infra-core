@@ -35,7 +35,7 @@ catalog:
       rules:
         - allow: [User, Group, Component, System]
     - type: url
-      target: https://github.com/PHACDataHub/infra-core/blob/main/backstage/templates/vertexai/template.yaml
+      target: https://github.com/PHACDataHub/infra-core/blob/main/templates/vertexai/template.yaml
       rules:
         - allow: [Template]
 
