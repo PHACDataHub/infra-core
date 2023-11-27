@@ -89,7 +89,7 @@ spec:
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: xvertexai
+  name: vertexai
 spec:
   compositeTypeRef:
     apiVersion: dip.phac.gc.ca/v1beta1

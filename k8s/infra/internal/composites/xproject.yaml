@@ -108,7 +108,7 @@ spec:
               }
 
               output "project_id" {
-                value = random_id.project_unique_id.id
+                value = random_id.project_unique_id.hex
               }
           providerConfigRef:
             name: terraform
