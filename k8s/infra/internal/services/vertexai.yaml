@@ -186,7 +186,7 @@ spec:
         kind: ProjectService
         spec:
           forProvider:
-            disableDependentServices: true
+            disableOnDestroy: false
             service: serviceusage.googleapis.com
           providerConfigRef:
             name: gcp
@@ -204,7 +204,7 @@ spec:
         kind: ProjectService
         spec:
           forProvider:
-            disableDependentServices: true
+            disableOnDestroy: false
             service: compute.googleapis.com
           providerConfigRef:
             name: gcp
@@ -222,7 +222,7 @@ spec:
         kind: ProjectService
         spec:
           forProvider:
-            disableDependentServices: true
+            disableOnDestroy: false
             service: cloudresourcemanager.googleapis.com
           providerConfigRef:
             name: gcp
@@ -240,7 +240,7 @@ spec:
         kind: ProjectService
         spec:
           forProvider:
-            disableDependentServices: true
+            disableOnDestroy: false
             service: notebooks.googleapis.com
           providerConfigRef:
             name: gcp
@@ -450,22 +450,6 @@ spec:
           of:
             apiVersion: gcp.upbound.io/v1beta1
             kind: ProviderConfig
-            resourceSelector:
-              matchControllerRef: true
-          by:
-            apiVersion: notebooks.gcp.upbound.io/v1beta1
-            kind: Runtime
-            resourceSelector:
-              matchControllerRef: true
-
-    - name: Notebook-uses-notebooksapi
-      base:
-        apiVersion: apiextensions.crossplane.io/v1alpha1
-        kind: Usage
-        spec:
-          of:
-            apiVersion: cloudplatform.gcp.upbound.io/v1beta1
-            kind: ProjectService
             resourceSelector:
               matchControllerRef: true
           by:
