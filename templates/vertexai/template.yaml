@@ -45,13 +45,6 @@ spec:
             - Montréal (northamerica-northeast1)
             - Toronto (northamerica-northeast2)
 
-        ipCidrRange:
-          title: IP CIDR Range
-          type: string
-          description: IP CIDR Range for the VPC
-          ui:autofocus: true
-          default: "10.162.0.0/20"
-
         idleShutdownTimeout:
           title: Idle Shutdown Timeout
           type: integer
@@ -64,12 +57,44 @@ spec:
           type: string
           description: Compute instance type to use. See https://cloud.google.com/compute/docs/general-purpose-machines#n1-standard for valid values
           ui:autofocus: true
-          default: n1-standard-2
+          default: n1-standard-1
+          enum:
+            - n1-standard-1
+            - n1-standard-2
+            - n1-standard-4
+            - n1-standard-8
+            - n1-standard-16
+            - n1-standard-32
+            - n1-standard-64
+            - n1-standard-96
+            - n1-highmem-2
+            - n1-highmem-4
+            - n1-highmem-8
+            - n1-highmem-16
+            - n1-highmem-32
+            - n1-highmem-64
+            - n1-highmem-96
+          enumNames:
+            - 1vCPU, 3.75GB Memory
+            - 2vCPU (1 core), 7.5GB Memory
+            - 4vCPU (2 core), 15GB Memory
+            - 8vCPU (4 core), 30GB Memory
+            - 16vCPU (8 core), 60GB Memory
+            - 32vCPU (16 core), 120GB Memory
+            - 64vCPU (32 core), 240GB Memory
+            - 96vCPU (48 core), 360GB Memory
+            - 2vCPU (1 core), 13GB Memory
+            - 4vCPU (2 core), 26GB Memory
+            - 8vCPU (4 core), 52GB Memory
+            - 16vCPU (8 core), 104GB Memory
+            - 32vCPU (16 core), 208GB Memory
+            - 64vCPU (32 core), 416GB Memory
+            - 96vCPU (48 core), 624GB Memory
 
         diskType:
           title: Disk Type
           type: string
-          description: IP CIDR Range for the VPC
+          description: The type of the boot disk attached to this runtime. See https://cloud.google.com/compute/docs/disks/#disk-types for more info.
           ui:autofocus: true
           default: PD_STANDARD
           enum:
@@ -111,7 +136,6 @@ spec:
         values:
           name: ${{ parameters.name }}
           iamUser: ${{ parameters.iamUser }}
-          ipCidrRange: ${{ parameters.ipCidrRange }}
           region: ${{ parameters.region }}
           idleShutdownTimeout: ${{ parameters.idleShutdownTimeout }}
           machineType: ${{ parameters.machineType }}
