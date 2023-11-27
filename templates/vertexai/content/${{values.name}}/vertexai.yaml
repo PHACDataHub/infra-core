@@ -7,7 +7,6 @@ metadata:
 spec:
   name: ${{ values.name | dump }}
   iamUser: ${{ values.iamUser | dump }}
-  ipCidrRange: ${{ values.ipCidrRange | dump }}
   region: ${{ values.region | dump }}
   notebookConfig:
     idleShutdownTimeout: ${{ values.idleShutdownTimeout | dump }}
