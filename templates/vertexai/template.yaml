@@ -20,6 +20,7 @@ spec:
           title: Project Name
           type: string
           description: Name of the project
+          maxLength: 30
           ui:autofocus: true
           pattern: ^[a-z0-9-]+$
 

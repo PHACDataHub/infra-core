@@ -24,9 +24,11 @@ spec:
                 name:
                   type: string
                   description: Name of the resource on gcp
+                  maxLength: 30
                 iamUser:
                   type: string
                   description: GCP user id for the project
+                  format: email
                 ipCidrRange:
                   type: string
                   description: CIDR Range for the subnet
