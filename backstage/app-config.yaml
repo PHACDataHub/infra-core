@@ -1,3 +1,4 @@
+# This file is used for local development. For production settings see: app-config.k8s.yaml
 app:
   title: PHAC Internal Data Hub
   baseUrl: http://localhost:3000
@@ -50,11 +51,13 @@ proxy:
 # and an external cloud storage when deploying TechDocs for production use-case.
 # https://backstage.io/docs/features/techdocs/how-to-guides#how-to-migrate-from-techdocs-basic-to-recommended-deployment-approach
 techdocs:
-  builder: 'local' # Alternatives - 'external'
-  generator:
-    runIn: 'docker' # Alternatives - 'local'
+  builder: 'external'
+  generators:
+    runIn: 'docker'
   publisher:
-    type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+    type: 'googleGcs'
+    googleGcs:
+      bucketName: 'backstage-techdocs-01hdpgnv25h'
 
 auth:
   # see https://backstage.io/docs/auth/ to learn about auth providers
@@ -74,24 +77,8 @@ catalog:
   rules:
     - allow: [Component, System, API, Resource, Location]
   locations:
-    # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
-      target: ../../examples/entities.yaml
-
-    # Local example template
-    - type: file
-      target: ../../examples/template/template.yaml
-      rules:
-        - allow: [Template]
-
-    # Local example organizational data
-    - type: file
-      target: ../../examples/org.yaml
-      rules:
-        - allow: [User, Group]
-
-    - type: file
-      target: ../../../meta/catalog-info.yaml
+      target: ../../../catalog-info.yaml
       rules:
         - allow: [User, Group, Component, System]
 
