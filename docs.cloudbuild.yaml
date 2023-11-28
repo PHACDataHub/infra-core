@@ -1,0 +1,18 @@
+steps:
+  # https://github.com/nikolaik/docker-python-nodejs
+  - name: 'nikolaik/python-nodejs:python3.11-nodejs18-slim'
+    args:
+      - '-c'
+      - |
+        # https://backstage.io/docs/features/techdocs/configuring-ci-cd
+        npm install -g @techdocs/cli
+
+        python -m pip install mkdocs-techdocs-core==1.*
+
+        techdocs-cli generate --no-docker --verbose
+
+        techdocs-cli publish --publisher-type googleGcs --storage-name
+        backstage-techdocs-01hdpgnv25h --entity default/component/backstage  
+    id: Build and push docs
+    entrypoint: bash
+
