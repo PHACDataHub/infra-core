@@ -31,7 +31,7 @@ catalog:
     - allow: [Component, System, API, Resource, Location]
   locations:
     - type: url
-      target: https://github.com/PHACDataHub/infra-core/blob/configure-techdocs/catalog-info.yaml
+      target: https://github.com/PHACDataHub/infra-core/blob/main/catalog-info.yaml
       rules:
         - allow: [User, Group, Component, System]
     - type: url
