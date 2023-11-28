@@ -11,8 +11,7 @@ steps:
 
         techdocs-cli generate --no-docker --verbose
 
-        techdocs-cli publish --publisher-type googleGcs --storage-name
-        backstage-techdocs-01hdpgnv25h --entity default/component/backstage  
+        techdocs-cli publish --publisher-type googleGcs --storage-name backstage-techdocs-01hdpgnv25h --entity default/component/infra-core  
     id: Build and push docs
     entrypoint: bash
 
