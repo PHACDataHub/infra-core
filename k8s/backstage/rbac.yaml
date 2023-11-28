@@ -31,6 +31,8 @@ kind: ServiceAccount
 metadata:
   name: backstage
   namespace: backstage
+  annotations:
+    iam.gke.io/gcp-service-account: techdocs-object-admin@php-01hdpgnv25h.iam.gserviceaccount.com
 ---
 apiVersion: v1
 kind: Secret
