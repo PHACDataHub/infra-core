@@ -1,3 +1,4 @@
+# This file is used for local development. For production settings see: app-config.k8s.yaml
 app:
   title: PHAC Internal Data Hub
   baseUrl: http://localhost:3000
@@ -35,8 +36,7 @@ backend:
 integrations:
   github:
     - host: github.com
-      apps:
-        - $include: github-app-backstage-phac-credentials.yaml
+      token: ${GITHUB_TOKEN}
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
