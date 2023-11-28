@@ -39,13 +39,14 @@ catalog:
       rules:
         - allow: [Template]
 
-# default configuration is required else it causes a validation error
 techdocs:
-  builder: 'local' 
-  generator:
-    runIn: 'docker' 
+  builder: 'external'
+  generators:
+    runIn: 'docker'
   publisher:
-    type: 'local' 
+    type: 'googleGcs'
+    googleGcs:
+      bucketName: 'backstage-techdocs-01hdpgnv25h'
 
 kubernetes:
   serviceLocatorMethod:
