@@ -1,0 +1,22 @@
+apiVersion: cloudbuild.gcp.upbound.io/v1beta1
+kind: Trigger
+metadata:
+  name: docs-main
+spec:
+  deletionPolicy: Delete
+  forProvider:
+    filename: docs.cloudbuild.yaml
+    name: techdocs-trigger
+    description: Trigger to build and push backstage techdocs to GCS
+    location: northamerica-northeast1
+    includedFiles:
+      - docs/**
+    includeBuildLogs: INCLUDE_BUILD_LOGS_WITH_STATUS
+    github:
+      # need to manually connect repo to cloud build via console
+      - name: infra-core 
+        owner: PHACDataHub
+        push:
+          - branch: configure-techdocs
+  providerConfigRef:
+    name: gcp
