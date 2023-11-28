@@ -1,0 +1,11 @@
+apiVersion: storage.gcp.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  name: backstage-techdocs-01hdpgnv25h
+spec:
+  deletionPolicy: Delete
+  forProvider:
+    location: northamerica-northeast1
+    uniformBucketLevelAccess: true
+  providerConfigRef:
+    name: gcp
