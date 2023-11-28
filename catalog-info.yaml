@@ -8,7 +8,7 @@ metadata:
     google.com/cloudbuild-project-slug: php-01hdpgnv25h
     github.com/project-slug: PHACDataHub/infra-core
     backstage.io/kubernetes-id: infra-core
-    backstage.io/techdocs-ref: dir:./../
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: service
   owner: group:platform-team
