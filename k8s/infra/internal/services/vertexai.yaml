@@ -282,6 +282,12 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.region
           toFieldPath: spec.region
+        # patch projectId
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.xproject.projectId
+          toFieldPath: spec.projectId
+          policy:
+            fromFieldPath: Required
         # write networkId
         - type: ToCompositeFieldPath
           fromFieldPath: status.networkId

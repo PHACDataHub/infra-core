@@ -33,9 +33,12 @@ spec:
                   type: string
                   description: Subnet region
                   default: northamerica-northeast1
+                projectId:
+                  type: string
+                  description: The ID of the project in which the resource belongs. If it is not provided, the provider project is used.
               required:
                 - name
-                - providerConfig
+                - projectId
             status:
               type: object
               properties:
@@ -73,7 +76,8 @@ spec:
             autoCreateSubnetworks: false
             mtu: 1460
             routingMode: REGIONAL
-          providerConfigRef: {}
+          providerConfigRef:
+            name: gcp
       patches:
         - type: PatchSet
           patchSetName: name-providerconfig-patchset
@@ -81,6 +85,10 @@ spec:
         - type: ToCompositeFieldPath
           fromFieldPath: "status.atProvider.id"
           toFieldPath: "status.networkId"
+        # patch projectId
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.projectId
+          toFieldPath: spec.forProvider.project
 
     - name: Subnet
       base:
@@ -90,7 +98,8 @@ spec:
           deletionPolicy: Delete
           forProvider: 
             region: northamerica-northeast1
-          providerConfigRef: {}
+          providerConfigRef:
+            name: gcp
       patches:
         - type: PatchSet
           patchSetName: name-providerconfig-patchset
@@ -110,3 +119,7 @@ spec:
         - type: ToCompositeFieldPath
           fromFieldPath: "status.atProvider.id"
           toFieldPath: "status.subnetworkId"
+        # patch projectId
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.projectId
+          toFieldPath: spec.forProvider.project
