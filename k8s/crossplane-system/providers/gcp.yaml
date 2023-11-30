@@ -46,3 +46,10 @@ metadata:
   name: upbound-gcp-notebooks
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-notebooks:v0.38.0
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: upbound-gcp-container
+spec:
+  package: xpkg.upbound.io/upbound/provider-gcp-container:v0.39.0

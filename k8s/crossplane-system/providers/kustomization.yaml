@@ -17,7 +17,7 @@ patches:
           name: resource-config-general
     target:
       kind: Provider
-      name: "(upbound-gcp-storage|upbound-gcp-dns|upbound-gcp-artifact|upbound-gcp-cloudbuild|upbound-gcp-notebooks)"
+      name: "(upbound-gcp-storage|upbound-gcp-dns|upbound-gcp-artifact|upbound-gcp-cloudbuild|upbound-gcp-notebooks|upbound-gcp-container)"
   - patch: |
       apiVersion: pkg.crossplane.io/v1
       kind: Provider
