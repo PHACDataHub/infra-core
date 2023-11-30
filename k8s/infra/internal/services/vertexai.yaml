@@ -29,13 +29,9 @@ spec:
                   type: string
                   description: GCP user id for the project
                   format: email
-                ipCidrRange:
-                  type: string
-                  description: CIDR Range for the subnet
-                  default: "10.162.0.0/20"
                 region:
                   type: string
-                  description: Subnet region
+                  description: Location where the notebook machine resides
                   default: northamerica-northeast1
                   enum:
                     - northamerica-northeast1
@@ -79,13 +75,6 @@ spec:
                     projectNumber:
                       type: string
                     serviceAccountEmail:
-                      type: string
-                xnetwork:
-                  type: object
-                  properties:
-                    networkId:
-                      type: string
-                    subnetworkId:
                       type: string
 ---
 apiVersion: apiextensions.crossplane.io/v1
@@ -182,60 +171,6 @@ spec:
       readinessChecks:
         - type: None
 
-    - name: enable-service-usage
-      base:
-        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
-        kind: ProjectService
-        spec:
-          forProvider:
-            disableOnDestroy: false
-            service: serviceusage.googleapis.com
-          providerConfigRef:
-            name: gcp
-      patches:
-        # patch project_id 
-        - type: FromCompositeFieldPath
-          fromFieldPath: status.xproject.projectId
-          toFieldPath: spec.forProvider.project
-          policy:
-            fromFieldPath: Required
-
-    - name: enable-compute-engine
-      base:
-        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
-        kind: ProjectService
-        spec:
-          forProvider:
-            disableOnDestroy: false
-            service: compute.googleapis.com
-          providerConfigRef:
-            name: gcp
-      patches:
-        # patch project_id 
-        - type: FromCompositeFieldPath
-          fromFieldPath: status.xproject.projectId
-          toFieldPath: spec.forProvider.project
-          policy:
-            fromFieldPath: Required
-
-    - name: enable-cloudresourcemanager
-      base:
-        apiVersion: cloudplatform.gcp.upbound.io/v1beta1
-        kind: ProjectService
-        spec:
-          forProvider:
-            disableOnDestroy: false
-            service: cloudresourcemanager.googleapis.com
-          providerConfigRef:
-            name: gcp
-      patches:
-        # patch project_id 
-        - type: FromCompositeFieldPath
-          fromFieldPath: status.xproject.projectId
-          toFieldPath: spec.forProvider.project
-          policy:
-            fromFieldPath: Required
-
     - name: enable-notebooks
       base:
         apiVersion: cloudplatform.gcp.upbound.io/v1beta1
@@ -255,52 +190,6 @@ spec:
             fromFieldPath: Required
 
     # all resources from this point on use the gcp-`name` providerconfig (created above)
-    - name: XNetwork
-      base:
-        apiVersion: dip.phac.gc.ca/v1beta1
-        kind: XNetwork
-        spec: {} 
-      patches:
-        # patch name
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.name
-          toFieldPath: spec.name
-        # patch ProviderConfig 
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.name
-          toFieldPath: spec.providerConfig
-          transforms:
-            - type: string
-              string:
-                type: Format
-                fmt: "gcp-%s"
-        # patch ipCidrRange
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.ipCidrRange
-          toFieldPath: spec.ipCidrRange
-        # patch region
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.region
-          toFieldPath: spec.region
-        # patch projectId
-        - type: FromCompositeFieldPath
-          fromFieldPath: status.xproject.projectId
-          toFieldPath: spec.projectId
-          policy:
-            fromFieldPath: Required
-        # write networkId
-        - type: ToCompositeFieldPath
-          fromFieldPath: status.networkId
-          toFieldPath: status.xnetwork.networkId
-          policy:
-            fromFieldPath: Required
-        # write subnetId
-        - type: ToCompositeFieldPath
-          fromFieldPath: status.subnetworkId
-          toFieldPath: status.xnetwork.subnetworkId
-          policy:
-            fromFieldPath: Required
-
     - name: Bucket
       base:
         apiVersion: storage.gcp.upbound.io/v1beta1
@@ -329,8 +218,6 @@ spec:
       base:
         apiVersion: notebooks.gcp.upbound.io/v1beta1
         kind: Runtime
-        metadata:
-          name: tbproject-dev
         spec:
           forProvider:
             accessConfig:
@@ -388,18 +275,6 @@ spec:
                 fmt: "%s-compute@developer.gserviceaccount.com"
           policy:
             fromFieldPath: Required
-        # # patch network
-        # - type: FromCompositeFieldPath
-        #   fromFieldPath: status.xnetwork.networkId
-        #   toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].network
-        #   policy:
-        #     fromFieldPath: Required
-        # # patch subnet
-        # - type: FromCompositeFieldPath
-        #   fromFieldPath: status.xnetwork.subnetworkId
-        #   toFieldPath: spec.forProvider.virtualMachine[0].virtualMachineConfig[0].subnet
-        #   policy:
-        #     fromFieldPath: Required
               
     # specify dependencies for graceful deletion else project is deleted with dangling k8s resources
     - name: providerconfig-uses-xproject
@@ -415,22 +290,6 @@ spec:
           by:
             apiVersion: gcp.upbound.io/v1beta1
             kind: ProviderConfig
-            resourceSelector:
-              matchControllerRef: true
-
-    - name: XNetwork-uses-providerconfig
-      base:
-        apiVersion: apiextensions.crossplane.io/v1alpha1
-        kind: Usage
-        spec:
-          of:
-            apiVersion: gcp.upbound.io/v1beta1
-            kind: ProviderConfig
-            resourceSelector:
-              matchControllerRef: true
-          by:
-            apiVersion: dip.phac.gc.ca/v1beta1
-            kind: XNetwork
             resourceSelector:
               matchControllerRef: true
 
