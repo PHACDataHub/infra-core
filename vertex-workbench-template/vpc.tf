@@ -19,7 +19,7 @@ resource "google_compute_global_address" "private_ip_alloc" {
   project       = var.project
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
-  prefix_length = 24  # VPC Peering prefix should be less than the total subnet CIDR.
+  prefix_length = 24 # VPC Peering prefix should be less than the total subnet CIDR.
   network       = google_compute_network.vpc_network.id
 }
 

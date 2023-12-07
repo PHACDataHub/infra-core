@@ -18,7 +18,7 @@ resource "google_notebooks_instance" "notebook_instance" {
   location     = var.zone
   network      = google_compute_network.vpc_network.id
   subnet       = google_compute_subnetwork.vertex_subnetwork.id
-  no_public_ip = true  # No public IP will be assigned to this instance.
+  no_public_ip = true # No public IP will be assigned to this instance.
 
   labels = lookup(each.value, "nb_labels", null)
 
@@ -76,6 +76,6 @@ resource "google_notebooks_instance" "notebook_instance" {
   depends_on = [
     google_service_account.vertex_service_account,
     google_compute_network.vpc_network,
-    google_compute_subnetwork.vertex-subnetwork
+    google_compute_subnetwork.vertex_subnetwork
   ]
 }
