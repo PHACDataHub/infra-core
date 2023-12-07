@@ -44,3 +44,11 @@ spec:
         in_cluster_config = true
       }
     }
+---
+apiVersion: kubernetes.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: kubernetes
+spec:
+  credentials:
+    source: InjectedIdentity
