@@ -1,0 +1,255 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xfluxgke.dip.phac.gc.ca
+spec:
+  defaultCompositeDeletePolicy: Foreground
+  group: dip.phac.gc.ca
+  names:
+    kind: XFluxGKE
+    plural: xfluxgke
+  versions:
+    - name: v1beta1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the GKE cluster
+                  maxLength: 30
+                xnetwork:
+                  type: object
+                  description: Network configurations
+                  properties:
+                    networkId:
+                      type: string
+                    subnetworkId:
+                      type: string
+                ghVersion:
+                  type: string
+                  description: Version for GH CLI
+                  default: "2.39.2"
+                fluxVersion:
+                  type: string
+                  description: Version for Flux CLI
+                  default: "2.1.2"
+                # change this to repo name
+                repoName:
+                  type: string
+                  description: SSH url for the repository
+                region:
+                  type: string
+                  description: Subnet region
+                  default: northamerica-northeast1
+                  enum:
+                    - northamerica-northeast1
+                    - northamerica-northeast2
+                projectId:
+                  type: string
+                  description: The ID of the project in which the resource belongs. If it is not provided, the provider project is used.
+                providerConfig:
+                  type: string
+                  description: Name of the Provider to use
+                  default: gcp
+              required:
+                - name
+                - projectId
+                - xnetwork
+                - repoName
+            status:
+              type: object
+              properties:
+                cluster:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: fluxgke
+spec:
+  compositeTypeRef:
+    apiVersion: dip.phac.gc.ca/v1beta1
+    kind: XFluxGKE
+  patchSets:
+  # patch providerConfigRef and resource name
+  - name: name-providerconfig-patchset
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.providerConfig
+      toFieldPath: spec.providerConfigRef.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.name
+      toFieldPath: "metadata.annotations[crossplane.io/external-name]"
+  resources:
+    - name: gke-auto
+      base:
+        apiVersion: container.gcp.upbound.io/v1beta1
+        kind: Cluster
+        spec:
+          deletionPolicy: Delete
+          forProvider:
+            enableAutopilot: true
+            allowNetAdmin: true
+            masterAuth:
+              - clientCertificateConfig:
+                  - issueClientCertificate: false
+          providerConfigRef:
+            name: gcp
+      patches:
+        - type: PatchSet
+          patchSetName: name-providerconfig-patchset
+        # patch location
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.region
+          toFieldPath: spec.forProvider.location
+        # patch projectId
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.projectId
+          toFieldPath: spec.forProvider.project
+        # patch network
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.xnetwork.networkId
+          toFieldPath: spec.forProvider.network
+        # patch subnet
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.xnetwork.subnetworkId
+          toFieldPath: spec.forProvider.subnetwork
+        # patch cluster id
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.id
+          toFieldPath: status.cluster.id
+          policy:
+            fromFieldPath: Required
+
+
+    - name: bootstrap-flux
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        spec:
+          forProvider:
+            manifest:
+              apiVersion: batch/v1
+              kind: Job
+              metadata:
+                namespace: crossplane-system
+              spec:
+                backoffLimit: 1
+                template:
+                  spec:
+                    serviceAccount: management-sa
+                    restartPolicy: Never
+                    volumes:
+                      - name: shared-data
+                        emptyDir: {}
+                    initContainers:
+                      - name: create-add-deploy-keys
+                        image: cgr.dev/chainguard/git:latest-root-dev
+                        command: ["/bin/bash", "-c"]
+                        args:
+                          - |
+                            ssh-keygen -t ed25519 -q -N "" -C "flux-read-write" -f /deploy/identity
+                            ssh-keyscan github.com > /deploy/known_hosts
+                            chmod 604 /deploy/identity
+
+                            wget -q -O - "https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/gh_${GH_CLI_VERSION}_linux_amd64.tar.gz" | tar -xzvf -
+                            mv gh_${GH_CLI_VERSION}_linux_amd64/bin/gh /bin/
+                            rm -rf gh_${GH_CLI_VERSION}_linux_amd64
+                            gh repo deploy-key add /deploy/identity.pub --allow-write --title flux-deploy -R ssh://git@github.com/vedant-org/${REPO_NAME}
+                        env:
+                          - name: GH_CLI_VERSION
+                            value: patched
+                          - name: REPO_NAME
+                            value: patched
+                          - name: GH_TOKEN
+                            valueFrom:
+                              secretKeyRef:
+                                name: gh-token
+                                key: token
+                        volumeMounts:
+                        - name: shared-data
+                          mountPath: /deploy
+                    containers:
+                      - name: install-flux
+                        image: google/cloud-sdk
+                        imagePullPolicy: IfNotPresent
+                        command: ["bin/bash", "-c"]
+                        args:
+                          - |
+                            gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION --project $PROJECT_ID
+                            curl -s https://fluxcd.io/install.sh | bash
+                            flux bootstrap git --url=ssh://git@github.com/vedant-org/${REPO_NAME} --path=k8s/ --branch=main --silent --private-key-file=/deploy/identity --cluster=gke_${PROJECT_ID}_${REGION}_${CLUSTER_NAME}
+                        env:
+                          - name: FLUX_VERSION
+                            value: patched
+                          # change this to repo name
+                          - name: REPO_NAME
+                            value: patched
+                          - name: CLUSTER_NAME
+                            value: patched
+                          - name: REGION
+                            value: patched
+                          - name: PROJECT_ID
+                            value: patched
+                          - name: CLUSTER_ID
+                            value: patched
+                        volumeMounts:
+                        - name: shared-data
+                          mountPath: /deploy
+          providerConfigRef: 
+            name: kubernetes
+      patches:
+        # patch job name
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+        # patch gh cli version for initContainer
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.ghVersion
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.initContainers[0].env[0].value
+        # patch repoName for initContainer
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.repoName
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.initContainers[0].env[1].value
+        # patch flux-version for container
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.fluxVersion
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].env[0].value
+        # patch repoName for container
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.repoName
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].env[1].value
+        # patch cluster name
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].env[2].value
+        # patch region
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.region
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].env[3].value
+        # patch project id
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.projectId
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].env[4].value
+        # wait for cluster to be ready
+        - type: FromCompositeFieldPath
+          fromFieldPath: status.cluster.id
+          toFieldPath: spec.forProvider.manifest.spec.template.spec.containers[0].env[5].value
+          policy:
+            fromFieldPath: Required
+
+        # # patch job status to XRD
+        # - type: ToCompositeFieldPath
+        #   fromFieldPath: status.job.status
+        #   toFieldPath: status.atProvider.manifest.status.conditions[0].type
+
