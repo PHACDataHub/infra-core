@@ -1,0 +1,44 @@
+---
+apiVersion: dip.phac.gc.ca/v1beta1
+kind: XNetwork
+metadata:
+  name: alpha-vpc
+spec: 
+  name: alpha-vpc
+  projectId: phsp-fb3a2b560a617fbf
+---
+apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+kind: ProjectService
+metadata:
+  name: alpha-compute
+spec:
+  forProvider:
+    disableDependentServices: false
+    project: phsp-fb3a2b560a617fbf
+    service: compute.googleapis.com
+  providerConfigRef:
+    name: gcp
+---
+apiVersion: cloudplatform.gcp.upbound.io/v1beta1
+kind: ProjectService
+metadata:
+  name: alpha-container
+spec:
+  forProvider:
+    disableDependentServices: false
+    project: phsp-fb3a2b560a617fbf
+    service: container.googleapis.com
+  providerConfigRef:
+    name: gcp
+---
+apiVersion: dip.phac.gc.ca/v1beta1
+kind: XFluxGKE
+metadata:
+  name: alpha
+spec:
+  name: alpha
+  projectId: phsp-fb3a2b560a617fbf
+  xnetwork:
+    networkId: projects/phsp-fb3a2b560a617fbf/global/networks/alpha-vpc
+    subnetworkId: projects/phsp-fb3a2b560a617fbf/regions/northamerica-northeast1/subnetworks/alpha-vpc
+  repoName: flux-token-auth 

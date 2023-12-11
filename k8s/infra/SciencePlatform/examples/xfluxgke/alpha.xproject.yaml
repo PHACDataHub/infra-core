@@ -1,0 +1,7 @@
+apiVersion: dip.phac.gc.ca/v1beta1
+kind: XProject
+metadata:
+  name: alpha
+spec:
+  vanityName: alpha
+  iamUser: vedant.thapa@gcp.hc-sc.gc.ca
