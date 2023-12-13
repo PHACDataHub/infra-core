@@ -1,7 +1,7 @@
-direction: right
+direction: down
 
 title: |md
-  # Network
+  # Network Overview
 |
 
 GCP Platform: {
@@ -50,17 +50,17 @@ TB Project: {
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
     }
 
-    gcr\.io-dns-policy-rule: {
+    notebooks\.cloud\.google\.com: {
       shape: image
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20DNS.svg
     }
 
-    notebooks\.cloud\.google\.com-dns-policy-rule: {
+    gcr\.io: {
       shape: image
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20DNS.svg
     }
 
-    private\.googleapis\.com-dns-policy-rule: {
+    private\.googleapis\.com: {
       shape: image
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20DNS.svg
     }
@@ -113,9 +113,21 @@ Google APIs and Services: {
 
   \*\.northamerica-northeast1\.notebooks\.cloud\.google\.com
 
+  \<random characters\>\.northamerica-northeast1\.notebooks\.cloud\.google\.com
+
   Artifact Registry: {
     shape: image
     icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FDeveloper%20Tools%2FContainer%20Registry.svg
+  }
+
+  nb-script: {
+    shape: image
+    icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FStorage%2FCloud%20Storage.svg
+  }
+
+  analytics-bucket: {
+    shape: image
+    icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FStorage%2FCloud%20Storage.svg
   }
 }
 
@@ -127,6 +139,13 @@ Internet: {
 GitHub: {
   shape: image
   icon: https://icons.terrastruct.com/dev%2Fgithub.svg
+}
+
+Client Browser: {
+  "": {
+    shape: image
+    icon: https://icons.terrastruct.com/tech%2Fbrowser-2.svg
+  }
 }
 
 # tcp ingress from github IPs is allowed
@@ -182,7 +201,7 @@ TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.
   }
 }
 
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.proxy-forwarding-agent -> TB Project.custom mode VPC.private-googleapis-ips-route -> TB Project.custom mode VPC.egress-allow-private-gcp-services -> Google APIs and Services.Private Google Services: {
+TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.proxy-forwarding-agent <-> TB Project.custom mode VPC.private-googleapis-ips-route <-> TB Project.custom mode VPC.egress-allow-private-gcp-services <-> Google APIs and Services.Private Google Services: {
   style: {
     stroke: deepskyblue
   }
@@ -203,3 +222,14 @@ TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.
 
 # cloud nat resource depends on cloud router
 TB Project.custom mode VPC.cloud-router <- TB Project.custom mode VPC.subnetwork.cloud-nat: depends on
+
+# Client browser connects to Google-managed proxy server
+Client Browser."" <-> Google APIs and Services.\<random characters\>\.northamerica-northeast1\.notebooks\.cloud\.google\.com <-> Google APIs and Services.Private Google Services: {
+  style: {
+    stroke: deepskyblue
+  }
+}
+
+# TODO: jupyterlab notebooks gets post-startup script from nb-script bucket
+# 
+# TODO: jupyterlab users read/write data from/to analytics-bucket
