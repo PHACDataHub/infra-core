@@ -1,6 +1,6 @@
 # Vertex Workbench Template
 
-This module is based closely off of the [datatonic google secure vertex workbench](https://github.com/teamdatatonic/terraform-google-secure-vertex-workbench/tree/main) Terraform module.
+This module builds off of the [datatonic google secure vertex workbench](https://github.com/teamdatatonic/terraform-google-secure-vertex-workbench/tree/main) Terraform module.
 
 ## VPC Network Setup
 
