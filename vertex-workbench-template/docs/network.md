@@ -1,6 +1,6 @@
 # Network Overview
 
-![network-diagram](./diagrams/network.svg)
+![network-diagram](./diagrams/network-overview.svg)
 
 ## VPC and Subnet
 
