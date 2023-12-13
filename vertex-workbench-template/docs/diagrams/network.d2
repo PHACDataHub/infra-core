@@ -1,4 +1,4 @@
-direction: left
+direction: right
 
 title: |md
   # Network
@@ -164,7 +164,7 @@ TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.
     stroke: orange
   }
 }
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab -> TB Project.custom mode VPC.private-googleapis-ips-route -> TB Project.custom mode VPC.egress-allow-private-gcp-services -> Google APIs and Services.Private Google Services {
+TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab -> TB Project.custom mode VPC.private-googleapis-ips-route -> TB Project.custom mode VPC.egress-allow-private-gcp-services -> Google APIs and Services.Private Google Services: {
   style: {
     stroke: orange
   }
@@ -182,8 +182,24 @@ TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.
   }
 }
 
+TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.proxy-forwarding-agent -> TB Project.custom mode VPC.private-googleapis-ips-route -> TB Project.custom mode VPC.egress-allow-private-gcp-services -> Google APIs and Services.Private Google Services: {
+  style: {
+    stroke: deepskyblue
+  }
+}
 
+Google APIs and Services.Private Google Services -> Google APIs and Services.\*\.northamerica-northeast1\.notebooks\.cloud\.google\.com: agent request to inverting proxy {
+  style: {
+    stroke: deepskyblue
+  }
+}
 
-# Google APIs and Services.Private Google Services -> Google APIs and Services.\*\.northamerica-northeast1\.notebooks\.cloud\.google\.com 
+# Jupyterlab needs to get ips from private.googleapis.com dns record
+TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab <-> TB Project.custom mode VPC.private\.googleapis\.com-dns-policy-rule: googleapis IPs {
+  style: {
+    stroke: orange
+  }
+}
 
-
+# cloud nat resource depends on cloud router
+TB Project.custom mode VPC.cloud-router <- TB Project.custom mode VPC.subnetwork.cloud-nat: depends on
