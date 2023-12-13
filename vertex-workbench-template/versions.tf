@@ -11,11 +11,3 @@ terraform {
     }
   }
 }
-
-provider "google" {
-  credentials = file("terraform-sa-key.json") # .gitignored local service account key.
-
-  project = var.project
-  region  = var.region
-  zone    = var.zone
-}
