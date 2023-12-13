@@ -35,5 +35,5 @@ terraform.rc
 
 # Ignore terraform service account key
 terraform-sa-key.json
-# Ignore local .env file
-.env
+# Ignore terraform lock file
+.terraform.lock.hcl
