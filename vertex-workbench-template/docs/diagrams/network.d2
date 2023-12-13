@@ -1,3 +1,5 @@
+direction: left
+
 title: |md
   # Network
 |
@@ -107,7 +109,7 @@ TB Project: {
 }
 
 Google APIs and Services: {
-  Private Google Service Domains
+  Private Google Services
 
   \*\.northamerica-northeast1\.notebooks\.cloud\.google\.com
 
@@ -155,3 +157,33 @@ TB Project.custom mode VPC.egress-deny-all -> internet: deny {
     stroke-dash: 3
   }
 }
+
+# proxy-forwarding-agent pulled from google service artifact registry
+TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab <-> TB Project.custom mode VPC.gcr\.io-dns-policy-rule: googleapis IPs {
+  style: {
+    stroke: orange
+  }
+}
+TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab -> TB Project.custom mode VPC.private-googleapis-ips-route -> TB Project.custom mode VPC.egress-allow-private-gcp-services -> Google APIs and Services.Private Google Services {
+  style: {
+    stroke: orange
+  }
+}
+Google APIs and Services.Private Google Services -> Google APIs and Services.Artifact Registry: proxy-forwarding-agent {
+  style: {
+    stroke: orange
+  }
+}
+
+# proxy-forwarding-agent initiates request to inverting proxy service
+TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.proxy-forwarding-agent <-> TB Project.custom mode VPC.notebooks\.cloud\.google\.com-dns-policy-rule: googleapis IPs {
+  style: {
+    stroke: deepskyblue
+  }
+}
+
+
+
+# Google APIs and Services.Private Google Services -> Google APIs and Services.\*\.northamerica-northeast1\.notebooks\.cloud\.google\.com 
+
+
