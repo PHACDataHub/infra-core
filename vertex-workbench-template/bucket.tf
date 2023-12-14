@@ -21,6 +21,8 @@ resource "google_storage_bucket" "analytics-bucket" {
   uniform_bucket_level_access = true
   # Do NOT force destroy buckets with data in them
   force_destroy = false
+  # Use autoclass tiering of storage
+
 
 }
 
