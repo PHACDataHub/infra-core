@@ -1,6 +1,4 @@
-# Analytics Environment Overview
+# Table of Contents
 
-The purpose of the analytics environment template is to provide infectious disease surveillance teams with the tools to develop and maintain their own data ingestion, cleaning, and analysis process.
-
-![analytics environment overview](./diagrams/overview.svg)
-
+- [Networking Controls](./network.md)
+- [Storage Controls](./bucket.md)
