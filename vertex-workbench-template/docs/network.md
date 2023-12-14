@@ -36,3 +36,10 @@ Neither the `proxy-forwarding-agent` ("Agent") nor the JupyterLab server ("Backe
 As part of the startup process of the Jupyterlab server (also managed by Google), the `proxy-forwarding-agent` sets up a connection with a Google-managed proxy server, and the proxy server provides a public URL that it is listening for requests on. The format of this URL will look something like `https://<random characters>-dot-<region>.notebooks.googleusercontent.com`. Users who visit this URL are taken though an [OAuth2.0 flow](https://oauth.net/2/) for authentication and authorization.
 
 Authenticated and authorized users have their request to the proxy server forwarded to the `proxy-forwarding-agent` that initiated the original request. The `proxy-forwarding-agent` forwards traffic to the Jupyterlab server. The Jupyterlab server responds to the `proxy-forwarding-agent`, which responds to the proxy server, which responds to the client that made the request.
+
+## DNS
+
+A number of Google APIs need to be accessed for various purposes.
+
+| API | Purpose |
+| --- | ------- |
