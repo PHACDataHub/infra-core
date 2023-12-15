@@ -5,6 +5,65 @@
 
 The purpose of the analytics environment template is to provide infectious disease surveillance teams with the tools to develop and maintain their own data ingestion, cleaning, and analysis process.
 
+## Deployment Instructions
+
+1. Clone this repo and checkout the appropriate branch (e.g. `git clone https://github.com/PHACDataHub/infra-core.git` $\rarrow$ `git checkout vertex-template`).
+2. Create a service account for terraform in the GCP Project you want to deploy into. This service account must have the `Owner` role for the project.
+3. Go to **APIs & Services** $\rarrow$ **Credentials** $\rarrow$ Click the terraform service account (this should look something like `terraform@<project-id>.iam.gserviceaccount.com`) $\rarrow$ Select **KEYS** $\rarrow$ **ADD KEY** $\rarrow$ **Create New Key** $\rarrow$ select **JSON** key type. **This JSON file should be treated as a sensitive value as it contains the private key for the service account**.
+4. Place the service account key from Step 3 in the `example` directory. Rename it `terraform-sa-key.json` (**or another name that is explicitly `.gitignore`d**).
+5. `cd example`
+6. `touch terraform.auto.tfvars` (also `.gitignore`d). This file contains any overrides for default terraform variables. The code snippet inserted below these instructions shows an example that creates a single vertex notebook along with a single GCS bucket.
+7. `terraform init`
+8. `terraform lint`
+9. `terraform plan`
+10. If the plan looks good, then `terraform apply`.
+
+**Example of `terraform.auto.tfvars`**
+
+```hcl
+project              = "<your project ID>"
+zone                 = "northamerica-northeast1-b"  # `northamerica-northeast1` == Montreal
+region               = "northamerica-northeast1"
+vpc_network_name     = "data-analytics-vpc"
+subnet_ip_cidr_range = "any valid RFC 1918 CIDR"  # E.g. `10.0.0.0/24`
+gcs_bucket_name      = "nb-script"
+
+notebooks = {
+  "example-user-managed-instance" : {
+    "instance_owner" : "<gcp email of notebook owner>"
+    "metadata" : {}
+    "type" : "user-managed-notebook",
+  }
+}
+
+additional_vertex_nb_sa_roles = [
+  "roles/dataproc.editor",
+  "roles/dataproc.hubAgent"
+]
+
+# Only include this if you want to add a specific allow rule to the firewall policies.
+# The example below allows egress to google.com
+additional_fw_rules = [{
+  name                    = "egress-allow-example-google"
+  description             = "Allow egress example"
+  direction               = "EGRESS"
+  priority                = 65534
+  ranges                  = ["142.250.178.14/32"] # google.com
+  source_tags             = null
+  source_service_accounts = null
+  target_tags             = null
+  target_service_accounts = null
+  allow = [{
+    protocol = "tcp"
+    ports    = ["80"]
+  }]
+  deny = []
+  log_config = {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+}]
+```
+
 ## Table of Contents
 
 - [Networking Controls](./docs/network.md)
