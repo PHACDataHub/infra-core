@@ -8,7 +8,7 @@ resource "google_storage_bucket" "bucket" {
 }
 
 resource "google_storage_bucket" "analytics-bucket" {
-  name     = "analytics-bucket"
+  name     = "${var.project}-analytics-bucket"
   location = var.region
   project  = var.project
   # Enable data versioning
