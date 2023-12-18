@@ -11,4 +11,5 @@ module "private_vertex_nb_instances" {
   additional_fw_rules           = var.additional_fw_rules
   gcs_bucket_name               = var.gcs_bucket_name
   gcs_labels                    = var.gcs_labels
+  notification_channels_email   = var.notification_channels_email
 }
