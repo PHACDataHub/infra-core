@@ -1,17 +1,19 @@
-## IAM Changes Monitoring in Google Cloud Storage Buckets
+# Logging and Monitoring
 
-The primary goal of this security control is to get immediate visibility when any important IAM changes happen to GCS buckets. This is achieved by creating a log-based metric that counts IAM changes and setting up alert policies based on that metric. This section outlines the process of setting up a security control to monitor IAM changes in Google Cloud Storage (GCS) buckets. The security control leverages Google Cloud's alerting and monitoring capabilities.
+This document outlines the practices the project follows around logging and metrics alerting.
+
+## How Metrics are Defined
+
+This section explains how log-based metrics and notifications are set up in this project, using a log-based metric that counts IAM changes on storage bucket resources as an example.
 
 ![monitoring-diagram](./diagrams/gcs-bucket-alert-policy.svg)
 
-### Implementation Steps
-
-#### 1. Create a notification channel.
+### 1. Create a notification channel.
 
 Use Terraform to create a [notification channel](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/monitoring_notification_channel) that is dedicated to receiving alerts for security changes. 
 
 
-```terraform
+```hcl
 resource "google_monitoring_notification_channel" "email_notification_channel" {
   type         = "email"
   labels = {
@@ -21,11 +23,11 @@ resource "google_monitoring_notification_channel" "email_notification_channel" {
 }
 ```
 
-#### 2. Define a metric based on the logs
+### 2. Define a metric based on the logs
 
 Define a counter [logging metric](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_metric) to track security changes in GCS buckets. The logs are filtered for resource type 'gcs_bucket' and specifically for 'storage.setIamPermissions' method in the payload.
 
-```terraform
+```hcl
 resource "google_logging_metric" "iam_changes_metric" {
   name      = "iam-changes-metric"
   filter    = "resource.type=gcs_bucket AND protoPayload.methodName='storage.setIamPermissions'"
@@ -36,11 +38,11 @@ resource "google_logging_metric" "iam_changes_metric" {
 }
 ```
 
-#### 3. Create a metric-based alert policy
+### 3. Create a metric-based alert policy
 
 Create a monitoring [alert policy](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/monitoring_alert_policy) to trigger when the counter metric is greater than 0 at any instant.
 
-```terraform
+```hcl
 resource "google_monitoring_alert_policy" "metrics_alert_policy" {
   display_name = "GCS IAM Monitoring Policy"
   combiner     = "OR"
@@ -56,3 +58,7 @@ resource "google_monitoring_alert_policy" "metrics_alert_policy" {
   notification_channels = [google_monitoring_notification_channel.email_notification.id]
 }
 ```
+
+## Project-Specific Metrics
+
+1. **IAM Changes to Storage Buckets**: The purpose of this security control is to get immediate visibility when any important IAM changes happen to GCS buckets.
