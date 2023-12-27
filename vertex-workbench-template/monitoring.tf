@@ -31,4 +31,11 @@ resource "google_monitoring_alert_policy" "metrics_alert_policy" {
     }
   }
   notification_channels = [google_monitoring_notification_channel.email_notification_channel.id]
+  documentation {
+    subject = "Change detected in bucket IAM"
+    content = <<EOF
+    One or more IAM changes was detected on the bucket indicated in this email.
+    If this activity is unrecognized, please follow up immediately. 
+    EOF
+  }
 }
