@@ -84,3 +84,8 @@ variable notification_channels_email {
   description = "Email address to send notifications for Alert Policies"
   type        = string
 }
+
+variable "analytics_bucket_name" {
+  description = "Name of the GCS Bucket for user data."
+  type        = string
+}
