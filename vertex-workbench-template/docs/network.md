@@ -2,6 +2,8 @@
 
 ![network-diagram](./diagrams/network-overview.svg)
 
+# Networking Components
+
 ## VPC and Subnet
 
 The network for the Vertex Project Template consists of a single [custom-mode VPC network](https://cloud.google.com/vpc/docs/vpc) and a single [regional subnetwork](https://cloud.google.com/vpc/docs/subnets) resource, which is hard-coded to [`northamerica-northeast1`](https://cloud.google.com/compute/docs/regions-zones) (i.e. Montréal). All notebook virtual machines are in this subnet.
@@ -43,3 +45,33 @@ A number of Google APIs need to be accessed for various purposes.
 
 | API | Purpose |
 | --- | ------- |
+
+# Network Flows
+
+This section outlines the details of each network flow.
+
+**Notes**
+
+- The CIDR 10.0.0.0/XX is used as a stand-in for a dynamically allocated RFC 1918 private IP address from the subnet.
+
+## Notebook Start Up and Authenticated Connection to Notebook Server
+
+| **Source IP/CIDR**| **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details** |
+| 10.0.0.0/XX | Ephemeral | 199.36.153.8/30 | 443 | 6 (TCP) | `forwarding-proxy-agent` initiates https connection to Google-managed proxy server via `private.googleapis.com` service. |
+| 199.36.153.8/30 | Ephemeral | 10.0.0.0/XX | 443 | 6 (TCP) | Source IP is from Google-managed proxy server, forwarding https user traffic to notebook sever. |
+
+
+**Notes**
+
+- 199.36.153.8/30 refers to the [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid). These IPs are only routable from within Google Cloud.
+
+## Github Clone Repository
+
+| **Source IP/CIDR**| **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details** |
+| 10.0.0.0/XX | Ephemeral | 140.82.112.0/20 | 443 | 6 (TCP) | NAT from 10.0.0.0/XX to regional external IP. |
+| 140.82.112.0/20 | 443 | 10.0.0.0/XX | Ephemeral | 6 (TCP) | NAT from regional external IP to 10.0.0.0/XX. |
+
+**Notes**
+
+- As per the [GitHub metadata API](https://api.github.com/meta), GitHub uses Public IP addresses from the range 140.82.112.0/20.
+- All egress is routed through a NAT Gateway router, so all private source IPs are translated to a public IP via the NAT Gateway.
