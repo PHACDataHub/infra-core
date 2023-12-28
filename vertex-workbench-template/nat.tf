@@ -20,6 +20,6 @@ resource "google_compute_router_nat" "nat" {
 
   log_config {
     enable = true
-    filter = "ERRORS_ONLY"
+    filter = "ALL"
   }
 }
