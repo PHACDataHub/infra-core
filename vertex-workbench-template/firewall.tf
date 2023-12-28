@@ -1,6 +1,25 @@
 locals {
   default_fw_rules = [
     {
+      name                    = "egress-deny-all"
+      description             = "Blanket default deny rule for egress"
+      direction               = "EGRESS"
+      priority                = 65535
+      ranges                  = ["0.0.0.0/0"]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow                   = []
+      deny = [{
+        protocol = "all"
+        ports    = null # All ports
+      }]
+      log_config = {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
+    },
+    {
       name        = "ingress-allow-tcp-git"
       description = "To allow connection to GitHub git endpoints - Ingress"
       direction   = "INGRESS"
@@ -36,44 +55,6 @@ locals {
       allow = [{
         protocol = "tcp"
         ports    = ["80", "443"]
-      }]
-      deny = []
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    },
-    {
-      name                    = "egress-deny-all"
-      description             = "Blanket default deny rule for egress"
-      direction               = "EGRESS"
-      priority                = 65535
-      ranges                  = ["0.0.0.0/0"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = null
-      target_service_accounts = null
-      allow                   = []
-      deny = [{
-        protocol = "all"
-        ports    = null # All ports
-      }]
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    },
-    {
-      name                    = "ingress-allow-tcp-ssh-from-iap"
-      description             = "FW rules required to ssh into instances via IAP - useful for diagnosing faulty notebooks/instances"
-      direction               = "INGRESS"
-      priority                = 65534
-      ranges                  = ["35.235.240.0/20"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = null
-      target_service_accounts = null
-      allow = [{
-        protocol = "tcp"
-        ports    = ["22"]
       }]
       deny = []
       log_config = {
@@ -118,25 +99,6 @@ locals {
         metadata = "INCLUDE_ALL_METADATA"
       }
     },
-    {
-      name                    = "egress-allow-fastly-cdn-for-pypi"
-      description             = "Allow egress from instances in this network to the Fastly CDN IP Ranges, which is used by PyPi"
-      direction               = "EGRESS"
-      priority                = 65534
-      ranges                  = ["23.235.32.0/20", "43.249.72.0/22", "103.244.50.0/24", "103.245.222.0/23", "103.245.224.0/24", "104.156.80.0/20", "140.248.64.0/18", "140.248.128.0/17", "146.75.0.0/17", "151.101.0.0/16", "157.52.64.0/18", "167.82.0.0/17", "167.82.128.0/20", "167.82.160.0/20", "167.82.224.0/20", "172.111.64.0/18", "185.31.16.0/22", "199.27.72.0/21", "199.232.0.0/16"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = null
-      target_service_accounts = null
-      allow = [{
-        protocol = "tcp"
-        ports    = ["443", "3128"]
-      }]
-      deny = []
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    }
   ]
   fw_rules = concat(local.default_fw_rules, var.additional_fw_rules)
 }
