@@ -61,7 +61,7 @@ locals {
       target_service_accounts = null
       allow = [{
         protocol = "tcp"
-        ports    = ["22", "80", "443", "9418"]
+        ports    = ["22", "80", "443"]
       }]
       deny = []
       log_config = {
@@ -129,7 +129,7 @@ locals {
       target_service_accounts = null
       allow = [{
         protocol = "tcp"
-        ports    = ["22", "80", "443", "9418"]
+        ports    = ["22", "80", "443"]
       }]
       deny = []
       log_config = {
