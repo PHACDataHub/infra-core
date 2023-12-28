@@ -56,9 +56,10 @@ This section outlines the details of each network flow.
 
 ## Notebook Start Up and Authenticated Connection to Notebook Server
 
-| **Source IP/CIDR**| **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details** |
-| 10.0.0.0/XX | Ephemeral | 199.36.153.8/30 | 443 | 6 (TCP) | `forwarding-proxy-agent` initiates https connection to Google-managed proxy server via `private.googleapis.com` service. |
-| 199.36.153.8/30 | Ephemeral | 10.0.0.0/XX | 443 | 6 (TCP) | Source IP is from Google-managed proxy server, forwarding https user traffic to notebook sever. |
+| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                                                                                                        |
+| ------------------ | --------------- | ---------------- | ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 10.0.0.0/XX        | Ephemeral       | 199.36.153.8/30  | 443           | 6 (TCP)          | `forwarding-proxy-agent` initiates https connection to Google-managed proxy server via `private.googleapis.com` service. |
+| 199.36.153.8/30    | Ephemeral       | 10.0.0.0/XX      | 443           | 6 (TCP)          | Source IP is from Google-managed proxy server, forwarding https user traffic to notebook sever.                          |
 
 
 **Notes**
@@ -67,9 +68,10 @@ This section outlines the details of each network flow.
 
 ## Github Clone Repository
 
-| **Source IP/CIDR**| **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details** |
-| 10.0.0.0/XX | Ephemeral | 140.82.112.0/20 | 443 | 6 (TCP) | NAT from 10.0.0.0/XX to regional external IP. |
-| 140.82.112.0/20 | 443 | 10.0.0.0/XX | Ephemeral | 6 (TCP) | NAT from regional external IP to 10.0.0.0/XX. |
+| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                             |
+| ------------------ | --------------- | ---------------- | ------------- | ---------------- | --------------------------------------------- |
+| 10.0.0.0/XX        | Ephemeral       | 140.82.112.0/20  | 443           | 6 (TCP)          | NAT from 10.0.0.0/XX to regional external IP. |
+| 140.82.112.0/20    | 443             | 10.0.0.0/XX      | Ephemeral     | 6 (TCP)          | NAT from regional external IP to 10.0.0.0/XX. |
 
 **Notes**
 
