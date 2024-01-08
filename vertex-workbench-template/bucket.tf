@@ -5,6 +5,8 @@ resource "google_storage_bucket" "bucket" {
   labels                      = var.gcs_labels
   uniform_bucket_level_access = true
   force_destroy               = true
+  # Disable public access
+  public_access_prevention = "enforced"
 }
 
 resource "google_storage_bucket" "analytics-bucket" {
@@ -22,8 +24,18 @@ resource "google_storage_bucket" "analytics-bucket" {
   # Do NOT force destroy buckets with data in them
   force_destroy = false
   # Use autoclass tiering of storage
+}
 
-
+resource "google_storage_bucket" "logging-bucket" {
+  name = "${var.project}-${var.analytics_bucket_name}-logs"
+  location = var.region
+  project = var.project
+  # Disable public access
+  public_access_prevention = "enforced"
+  # Use uniform bucket-level access (i.e. all users in the GCP Project have the same access to the storage bucket)
+  uniform_bucket_level_access = true
+  # Do NOT force destroy buckets with data in them
+  force_destroy = false
 }
 
 resource "google_storage_bucket_object" "postscript" {

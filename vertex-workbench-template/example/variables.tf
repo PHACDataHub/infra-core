@@ -80,12 +80,17 @@ variable "additional_fw_rules" {
   default = []
 }
 
-variable notification_channels_email {
+variable "notification_channels_email" {
   description = "Email address to send notifications for Alert Policies"
   type        = string
 }
 
 variable "analytics_bucket_name" {
   description = "Name of the GCS Bucket for user data."
+  type        = string
+}
+
+variable "logging_project_sink_name" {
+  description = "Logging project sink name"
   type        = string
 }
