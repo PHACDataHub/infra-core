@@ -41,6 +41,27 @@ locals {
       }
     },
     {
+      name        = "ingress-allow-intra-subnet"
+      description = "To allow connection to instances in the network - Ingress"
+      direction   = "INGRESS"
+      priority    = 65534
+      ranges = [
+        "10.2.0.0/16",
+      ]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow = [{
+        protocol = "all"
+        ports    = null # All ports
+      }]
+      deny = []
+      log_config = {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
+    },
+    {
       name        = "egress-allow-tcp-git"
       description = "To allow connection to GitHub git endpoints - Egress"
       direction   = "EGRESS"
@@ -99,6 +120,25 @@ locals {
         metadata = "INCLUDE_ALL_METADATA"
       }
     },
+    {
+      name                    = "egress-allow-intra-subnet"
+      description             = "Allow egress from instances in this network to the other instances in the network"
+      direction               = "EGRESS"
+      priority                = 65534
+      ranges                  = ["10.2.0.0/16"]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow = [{
+        protocol = "all"
+        ports    = null # All ports
+      }]
+      deny = []
+      log_config = {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
+    }
   ]
   fw_rules = concat(local.default_fw_rules, var.additional_fw_rules)
 }
