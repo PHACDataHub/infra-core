@@ -62,3 +62,8 @@ resource "google_monitoring_alert_policy" "metrics_alert_policy" {
 ## Project-Specific Metrics
 
 1. **IAM Changes to Storage Buckets**: The purpose of this security control is to get immediate visibility when any important IAM changes happen to GCS buckets.
+
+
+## Log Sinks
+
+A [logging sink](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_project_sink) resource is created to persist all logs with `severity >= WARNING` in a separate storage bucket. A [lifecycle rule](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket#example-usage---life-cycle-settings-for-storage-bucket-objects) can be added to the logging bucket to specify a retention policy for these logs, if required.
