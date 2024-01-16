@@ -68,7 +68,7 @@ additional_fw_rules = [{
 
 - [Networking Controls](./docs/network.md)
 - [Storage Controls](./docs/bucket.md)
-- [Jupyter Notebook](./docs/notebook.md)
+- [Jupyter and RStudio Images](./docs/jupyter-and-rstudio.md)
 - [Policies and Procedures](./docs/policies-and-procedures.md)
 - [Service Level Agreement](./docs/sla.md)
 
