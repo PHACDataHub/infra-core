@@ -183,3 +183,36 @@ variable "logging_project_sink_name" {
   description = "Logging project sink name"
   type        = string
 }
+
+# Cloud Build variables
+
+variable "cloudbuild_triggers" {
+  description = "Configuration for cloud build triggers"
+  type = map(object({
+    description     = optional(string)
+    tags            = optional(list(string), [])
+    service_account = optional(string)
+
+    git_file_source = object({
+      path     = string
+      repo_type = optional(string, "GITHUB")
+    })
+
+    github = object({
+      owner = string
+      repository = string
+
+      pull_request = optional(object({
+        branch         = optional(string)
+        invert_regex   = optional(bool)
+        comment_control = optional(string)
+      }))
+
+      push = optional(object({
+        branch       = optional(string)
+        tag          = optional(string)
+        invert_regex = optional(bool)
+      }))
+    })
+  }))
+}

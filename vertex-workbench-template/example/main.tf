@@ -14,4 +14,5 @@ module "private_vertex_nb_instances" {
   gcs_labels                    = var.gcs_labels
   notification_channels_email   = var.notification_channels_email
   logging_project_sink_name     = var.logging_project_sink_name
+  cloudbuild_triggers           = var.cloudbuild_triggers
 }
