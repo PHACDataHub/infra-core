@@ -7,8 +7,6 @@ resource "google_secret_manager_secret" "github_token_secret" {
   project   = var.project
   secret_id = "github-pat"
 
-  depends_on = [google_project_service.secret_manager_apis]
-
   replication {
     user_managed {
       replicas {
@@ -63,6 +61,7 @@ resource "google_cloudbuildv2_repository" "my-repository" {
 
 
 resource "google_cloudbuild_trigger" "jupyter-image-trigger" {
+  name = "vertex-image-build"
   location = var.region
 
   repository_event_config {
@@ -76,6 +75,7 @@ resource "google_cloudbuild_trigger" "jupyter-image-trigger" {
 }
 
 resource "google_cloudbuild_trigger" "rstudio-image-trigger" {
+  name = "rstudio-image-build"
   location = var.region
 
   repository_event_config {
