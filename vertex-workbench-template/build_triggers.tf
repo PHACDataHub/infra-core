@@ -1,41 +1,89 @@
-resource "google_cloudbuild_trigger" "build_trigger" {
-  for_each = var.cloudbuild_triggers
+/**
+See the following documentation for how to connect GCP cloud build to a private GitHub repository
+https://cloud.google.com/build/docs/automating-builds/github/connect-repo-github?generation=2nd-gen#connecting_a_github_host_programmatically
+*/
 
-  project       = var.project
-  name          = each.key
-  location      = var.region
-  description   = each.value.description
-  tags          = each.value.tags
-  disabled      = false
-  service_account = each.value.service_account
+resource "google_secret_manager_secret" "github_token_secret" {
+  project   = var.project
+  secret_id = "github-pat"
 
-  git_file_source {
-    path     = each.value.git_file_source.path
-    repo_type = each.value.git_file_source.repo_type
-  }
+  depends_on = [google_project_service.secret_manager_apis]
 
-  github {
-    owner = each.value.github.owner
-    name  = each.value.github.repository
-
-    dynamic "pull_request" {
-      for_each = each.value.github.pull_request != null ? [each.value.github.pull_request] : []
-
-      content {
-        branch         = pull_request.value.branch
-        invert_regex   = pull_request.value.invert_regex
-        comment_control = pull_request.value.comment_control
+  replication {
+    user_managed {
+      replicas {
+        location = "northamerica-northeast1"
       }
-    }
-
-    dynamic "push" {
-      for_each = each.value.github.push != null ? [each.value.github.push] : []
-
-      content {
-        branch       = push.value.branch
-        tag          = push.value.tag
-        invert_regex = push.value.invert_regex
+      replicas {
+        location = "northamerica-northeast2"
       }
     }
   }
+}
+
+resource "google_secret_manager_secret_version" "github_token_secret_version" {
+  secret      = google_secret_manager_secret.github_token_secret.id
+  secret_data = var.github_pat
+}
+
+data "google_project" "project" {
+}
+
+data "google_iam_policy" "serviceagent_secretAccessor" {
+  binding {
+    role    = "roles/secretmanager.secretAccessor"
+    members = ["serviceAccount:service-${data.google_project.project.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"]
+  }
+}
+
+resource "google_secret_manager_secret_iam_policy" "policy" {
+  project     = google_secret_manager_secret.github_token_secret.project
+  secret_id   = google_secret_manager_secret.github_token_secret.secret_id
+  policy_data = data.google_iam_policy.serviceagent_secretAccessor.policy_data
+}
+
+resource "google_cloudbuildv2_connection" "my_connection" {
+  project  = var.project
+  location = var.region
+  name     = "project-repo-connection"
+  github_config {
+    app_installation_id = var.github_cloudbuild_installation_id
+    authorizer_credential {
+      oauth_token_secret_version = google_secret_manager_secret_version.github_token_secret_version.id
+    }
+  }
+  depends_on = [google_secret_manager_secret_iam_policy.policy]
+}
+
+resource "google_cloudbuildv2_repository" "my-repository" {
+  name              = "infra-core"
+  parent_connection = google_cloudbuildv2_connection.my_connection.id
+  remote_uri        = var.cloudbuild_repo
+}
+
+
+resource "google_cloudbuild_trigger" "jupyter-image-trigger" {
+  location = var.region
+
+  repository_event_config {
+    repository = google_cloudbuildv2_repository.my-repository.id
+    push {
+      tag = "^jupyter.*"
+    }
+  }
+
+  filename = "jupyter-image/cloudbuild.yaml"
+}
+
+resource "google_cloudbuild_trigger" "rstudio-image-trigger" {
+  location = var.region
+
+  repository_event_config {
+    repository = google_cloudbuildv2_repository.my-repository.id
+    push {
+      tag = "^rstudio.*"
+    }
+  }
+
+  filename = "rstudio-image/cloudbuild.yaml"
 }
