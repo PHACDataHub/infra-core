@@ -186,33 +186,18 @@ variable "logging_project_sink_name" {
 
 # Cloud Build variables
 
-variable "cloudbuild_triggers" {
-  description = "Configuration for cloud build triggers"
-  type = map(object({
-    description     = optional(string)
-    tags            = optional(list(string), [])
-    service_account = optional(string)
-
-    git_file_source = object({
-      path     = string
-      repo_type = optional(string, "GITHUB")
-    })
-
-    github = object({
-      owner = string
-      repository = string
-
-      pull_request = optional(object({
-        branch         = optional(string)
-        invert_regex   = optional(bool)
-        comment_control = optional(string)
-      }))
-
-      push = optional(object({
-        branch       = optional(string)
-        tag          = optional(string)
-        invert_regex = optional(bool)
-      }))
-    })
-  }))
+variable "cloudbuild_repo" {
+  description = "GitHub repository where Jupyter/RStudio images are specified"
+  type        = string
 }
+
+variable "github_pat" {
+  description = "GitHub Personal Access Token"
+  type        = string
+}
+
+variable "github_cloudbuild_installation_id" {
+  description = "Installation ID of Cloud Build GitHub application."
+  type        = string
+}
+
