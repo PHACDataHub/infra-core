@@ -10,10 +10,9 @@ Projects are free to deviate from these base images if their projects have diffe
 
 ## Vulnerability Scanning
 
-This template supports one of two approaches for vulnerability scanning.
+This template supports building and scanning images in the continuous integration pipeline of the project-specific repository that instantiates it. This could be achieved, for example, by using the [trivy-action](https://github.com/aquasecurity/trivy-action) GitHub Action based on [Aqua Security's Trivy](https://github.com/aquasecurity/trivy) vulnerability scanning tool.
 
-1. Build and scan images in the continuous integration pipeline of the project-specific repository. This could be achieved, for example, by using the [trivy-action](https://github.com/aquasecurity/trivy-action) GitHub Action based on [Aqua Security's Trivy](https://github.com/aquasecurity/trivy) vulnerability scanning tool.
-2. Enable [Artifact analysis and vulnerability scanning](https://cloud.google.com/artifact-registry/docs/analysis) in the Artifact Registry repository of the GCP project.
+It is also possible to enable [Artifact analysis and vulnerability scanning](https://cloud.google.com/artifact-registry/docs/analysis) in the Artifact Registry repository of the GCP project, which could be [enabled as an alternative](https://github.com/hashicorp/terraform-provider-google/issues/7644) to performing vulnerability scanning via CI pipeline.
 
 The specific method of vulnerability scanning should be reviewed as part of the project-specific SA&A process. However, all projects must demonstrate that they undergo regular vulnerability scans on the OCI images they build and use.
 
