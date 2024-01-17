@@ -17,4 +17,5 @@ module "private_vertex_nb_instances" {
   cloudbuild_repo                   = var.cloudbuild_repo
   github_pat                        = var.github_pat
   github_cloudbuild_installation_id = var.github_cloudbuild_installation_id
+  repository_id                     = var.repository_id
 }

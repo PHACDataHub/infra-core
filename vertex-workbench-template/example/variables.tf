@@ -109,3 +109,8 @@ variable "github_cloudbuild_installation_id" {
   description = "Installation ID of Cloud Build GitHub application."
   type        = string
 }
+
+variable "repository_id" {
+  description = "The GCP Artifact Registry repository to create for the project."
+  type        = string
+}
