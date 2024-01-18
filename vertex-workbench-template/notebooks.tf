@@ -68,6 +68,16 @@ resource "google_notebooks_instance" "notebook_instance" {
       update_time,
     ]
   }
+
+  dynamic "container_image" {
+    for_each = length(each.value.container_images) > 0 ? [each.value.container_images[0]] : []
+
+    content {
+        repository = container_image.value.repository
+        tag = container_image.value.tag
+    }  
+  }
+
   depends_on = [
     google_service_account.vertex_service_account,
     google_compute_network.vpc_network,
