@@ -94,3 +94,23 @@ variable "logging_project_sink_name" {
   description = "Logging project sink name"
   type        = string
 }
+
+variable "cloudbuild_repo" {
+  description = "GitHub repository where Jupyter/RStudio images are specified"
+  type        = string
+}
+
+variable "github_pat" {
+  description = "GitHub Personal Access Token"
+  type        = string
+}
+
+variable "github_cloudbuild_installation_id" {
+  description = "Installation ID of Cloud Build GitHub application."
+  type        = string
+}
+
+variable "repository_id" {
+  description = "The GCP Artifact Registry repository to create for the project."
+  type        = string
+}
