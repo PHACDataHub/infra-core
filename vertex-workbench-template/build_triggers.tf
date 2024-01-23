@@ -60,20 +60,6 @@ resource "google_cloudbuildv2_repository" "my-repository" {
 }
 
 
-resource "google_cloudbuild_trigger" "jupyter-image-trigger" {
-  name = "vertex-image-build"
-  location = var.region
-
-  repository_event_config {
-    repository = google_cloudbuildv2_repository.my-repository.id
-    push {
-      tag = "^jupyter.*"
-    }
-  }
-
-  filename = "jupyter-image/cloudbuild.yaml"
-}
-
 resource "google_cloudbuild_trigger" "rstudio-image-trigger" {
   name = "rstudio-image-build"
   location = var.region
