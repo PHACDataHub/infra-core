@@ -46,7 +46,7 @@ locals {
       direction   = "INGRESS"
       priority    = 65534
       ranges = [
-        "10.2.0.0/16",
+        var.subnet_ip_cidr_range
       ]
       source_tags             = null
       source_service_accounts = null
@@ -121,11 +121,13 @@ locals {
       }
     },
     {
-      name                    = "egress-allow-intra-subnet"
-      description             = "Allow egress from instances in this network to the other instances in the network"
-      direction               = "EGRESS"
-      priority                = 65534
-      ranges                  = ["10.2.0.0/16"]
+      name        = "egress-allow-intra-subnet"
+      description = "Allow egress from instances in this network to the other instances in the network"
+      direction   = "EGRESS"
+      priority    = 65534
+      ranges = [
+        var.subnet_ip_cidr_range
+      ]
       source_tags             = null
       source_service_accounts = null
       target_tags             = null
