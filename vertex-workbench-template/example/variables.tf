@@ -108,7 +108,7 @@ variable "logging_project_sink_name" {
 }
 
 variable "cloudbuild_repo" {
-  description = "GitHub repository where Jupyter/RStudio images are specified"
+  description = "GitHub repository where the RStudio image is specified"
   type        = string
 }
 
