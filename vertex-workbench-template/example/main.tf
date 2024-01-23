@@ -18,4 +18,8 @@ module "private_vertex_nb_instances" {
   google_cloud_workstation_configurations = var.google_cloud_workstation_configurations
   google_cloud_workstations               = var.google_cloud_workstations
   workstation_users                       = var.workstation_users
+  cloudbuild_repo                         = var.cloudbuild_repo
+  github_pat                              = var.github_pat
+  github_cloudbuild_installation_id       = var.github_cloudbuild_installation_id
+  repository_id                           = var.repository_id
 }

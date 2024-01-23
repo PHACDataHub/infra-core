@@ -33,6 +33,9 @@ resource "google_notebooks_instance" "notebook_instance" {
     notebook-disable-downloads = lookup(each.value["metadata"], "notebook-disable-downloads", "true")
     notebook-disable-nbconvert = lookup(each.value["metadata"], "notebook-disable-nbconvert", "true")
     report-system-health       = lookup(each.value["metadata"], "report-system-health", "true")
+    # no direct config option for auto-upgrades (https://github.com/hashicorp/terraform-provider-google/issues/11660)
+    # using metadata as temporary work-around.
+    notebook-upgrade-schedule  = "00 19 * * MON"  
   }
   post_startup_script = "${google_storage_bucket.bucket.url}/${google_storage_bucket_object.postscript.name}"
 
@@ -68,6 +71,7 @@ resource "google_notebooks_instance" "notebook_instance" {
       update_time,
     ]
   }
+
   depends_on = [
     google_service_account.vertex_service_account,
     google_compute_network.vpc_network,
