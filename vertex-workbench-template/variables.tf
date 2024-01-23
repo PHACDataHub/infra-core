@@ -40,7 +40,7 @@ variable "image_project" {
 variable "image_family" {
   description = "Image family for the Notebook instances (https://cloud.google.com/compute/docs/images)"
   type        = string
-  default     = "common-cpu"
+  default     = "tf-2-3-cpu"
 }
 
 variable "machine_type" {

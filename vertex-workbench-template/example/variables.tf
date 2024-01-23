@@ -25,6 +25,18 @@ variable "notebooks" {
   default = {}
 }
 
+variable "image_project" {
+  description = "GCP Project conataining VM image for the Notebook instances"
+  type        = string
+  default     = "deeplearning-platform-release"
+}
+
+variable "image_family" {
+  description = "Image family for the Notebook instances (https://cloud.google.com/compute/docs/images)"
+  type        = string
+  default     = "tf-2-3-cpu"
+}
+
 variable "additional_vertex_nb_sa_roles" {
   description = "Additional roles that you may want to assign to the Vertex AI NB SA"
   type        = list(string)
