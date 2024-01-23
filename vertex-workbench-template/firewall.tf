@@ -99,6 +99,32 @@ locals {
         metadata = "INCLUDE_ALL_METADATA"
       }
     },
+    # At the time of writing, the GCP terraform module does not expose the workstation cluster control plane IP address.
+    # Since we have an Egress deny all rule, we need to explicitly allow egress from a workstation VM to the control plane.
+    # In the absence of the control plane IP being exposed by terraform, we need to use an overly permissive
+    # rule allowing egress to any IP on the subnet CIDR. See https://github.com/hashicorp/terraform-provider-google/issues/17022
+    # for more information.
+    {
+      name        = "egress-allow-intra-subnet"
+      description = "Allow egress from instances in this network to the other instances in the network"
+      direction   = "EGRESS"
+      priority    = 65534
+      ranges = [
+        var.subnet_ip_cidr_range
+      ]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow = [{
+        protocol = "all"
+        ports    = null # All ports
+      }]
+      deny = []
+      log_config = {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
+    }
   ]
   fw_rules = concat(local.default_fw_rules, var.additional_fw_rules)
 }
