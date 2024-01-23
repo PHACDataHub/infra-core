@@ -238,6 +238,7 @@ variable "workstation_users" {
   description = "List of workstation users"
   type        = list(string)
 }
+
 # Cloud Build variables
 
 variable "cloudbuild_repo" {
