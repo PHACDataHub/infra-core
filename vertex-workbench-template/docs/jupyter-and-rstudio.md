@@ -8,13 +8,31 @@ By default, the base images used for the Vertex Workbench Notebooks and Cloud Wo
 
 Projects are free to deviate from these base images if their projects have different requirements. Moreover, the review of the images used in a concrete instantiation of this template would be covered under the Security Assessment and Authorization (SA&A) process for the specific project instantiating this template.
 
-## Vulnerability Scanning
+## Vulnerability Scanning and Upgrades
 
-This template supports building and scanning images in the continuous integration pipeline of the project-specific repository that instantiates it. This could be achieved, for example, by using the [trivy-action](https://github.com/aquasecurity/trivy-action) GitHub Action based on [Aqua Security's Trivy](https://github.com/aquasecurity/trivy) vulnerability scanning tool.
+### OCI Image Scanning and Upgrades
+
+This template supports building and scanning OCI images in the continuous integration pipeline of the project-specific repository that instantiates it. This could be achieved, for example, by using the [trivy-action](https://github.com/aquasecurity/trivy-action) GitHub Action based on [Aqua Security's Trivy](https://github.com/aquasecurity/trivy) vulnerability scanning tool.
 
 It is also possible to enable [Artifact analysis and vulnerability scanning](https://cloud.google.com/artifact-registry/docs/analysis) in the Artifact Registry repository of the GCP project, which could be [enabled as an alternative](https://github.com/hashicorp/terraform-provider-google/issues/7644) to performing vulnerability scanning via CI pipeline.
 
+If any CVEs above a certain threshold are found, the image can be upgraded, scanned again, and pushed to the project's artifact registry once the detected CVEs have been patched.
+
 The specific method of vulnerability scanning should be reviewed as part of the project-specific SA&A process. However, all projects must demonstrate that they undergo regular vulnerability scans on the OCI images they build and use.
+
+By default, the [Rocker RStudio](https://rocker-project.org/images/versioned/rstudio.html) image used undergoes image scanning as described in this section of the documentation.
+
+### Cloud Workstation Upgrades
+
+As per the upstream documentation on [Cloud Workstations architecture](https://cloud.google.com/workstations/docs/architecture#vpc-network), it is possible to configure cloud workstations to retain the persistent disk when the unerlying cloud VM is deleted via the setting cloud workstations' [reclaim policy](https://cloud.google.com/workstations/docs/customize-development-environment#reclaimpolicy). Setting this reclaim policy allows the persistent disk to be mounted to a newly created VM instance, thereby allowing the base VM instance to be periodically destroyed and recreated to allow for updates to the underlying operating system.
+
+### GCP VM Image Scanning and Upgrades
+
+Vertex AI Workbench supports [automatically upgrading instances](https://cloud.google.com/vertex-ai/docs/workbench/user-managed/upgrade#automatic_upgrade), which is a setting that can be specified when the instance is created. This is currently set using the [`notebook-upgrade-schedule`](https://github.com/PHACDataHub/infra-core/blob/vertex-template/vertex-workbench-template/notebooks.tf#L38) metadata field and defining a cron schedule to specify the upgrade frequency.
+
+Vertex AI Workbench checks whether your instance can be upgraded, and if so, Vertex AI Workbench upgrades this instance. We also can upgrade user-installed libraries by adding ```--user``` flag [User-installed libraries](https://cloud.google.com/vertex-ai/docs/workbench/user-managed/upgrade#user-installed-libraries)
+
+By default, the Vertex AI notebook VM images used in this template have auto upgrading enabled so that patches are regularly applied.
 
 ## Image Builds
 
