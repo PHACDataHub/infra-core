@@ -56,10 +56,9 @@ Authenticated and authorized users have their request to the proxy server forwar
 
 ## DNS
 
-A number of Google APIs need to be accessed for various purposes.
+Following the example of Datatonic's [terrafrom-google-secure-vertex-workbench](https://github.com/teamdatatonic/terraform-google-secure-vertex-workbench/tree/main) terraform module, we create private [DNS response policy rules](https://cloud.google.com/dns/docs/zones/manage-response-policies) to map DNS records to GCP's [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid) rather than using Google's public IP ranges.
 
-| API | Purpose |
-| --- | ------- |
+Specifically, DNS queries matching `*.googleapis.com`, `*.gcr.io`, `*.pkg.dev`, or `*.notebooks.cloud.google.com` are routed to an IP address in `199.36.153.8/30`.
 
 # Network Flows
 
