@@ -124,6 +124,31 @@ locals {
       log_config = {
         metadata = "INCLUDE_ALL_METADATA"
       }
+    },
+    # At the time of writing, these are the specific IPs resolved for the closest CDN for PyPI and Fastly from
+    # the Montreal datacenter, where the notebook instances run. We need to periodically review and update these
+    # IP addresses, if they ever change due to infrastructure updates or CDN provider modifications.
+    {
+      name        = "egress-allow-pypi-fastly"
+      description = "Allow egress from instances in this network to pypi and fastly ips"
+      direction   = "EGRESS"
+      priority    = 65534
+      ranges = [
+        "151.101.64.223",
+        "199.232.36.223"
+      ]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow = [{
+        protocol = "tcp"
+        ports    = ["443"]
+      }]
+      deny = []
+      log_config = {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
     }
   ]
   fw_rules = concat(local.default_fw_rules, var.additional_fw_rules)
