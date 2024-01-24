@@ -78,6 +78,16 @@ This section outlines the details of each network flow.
 
 - 199.36.153.8/30 refers to the [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid). These IPs are only routable from within Google Cloud.
 
+## Installation of PyPI packages in Notebook VM 
+
+| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                             |
+| ------------------ | --------------- | ---------------- | ------------- | ---------------- | --------------------------------------------- |
+| 10.0.0.0/XX        | Ephemeral       | 151.101.64.223  | 443           | 6 (TCP)          | VM instance initiates HTTPS connection to PyPI for package metadata and information |
+| 151.101.64.223    | 443             | 10.0.0.0/XX      | Ephemeral     | 6 (TCP)          | Response from PyPI to VM instance for package metadata |
+| 10.0.0.0/XX        | Ephemeral       | 199.232.36.223  | 443           | 6 (TCP)          | VM instance initiates HTTPS connection to Fastly server for the source code files/distribution archives of packages to install |
+| 199.232.36.223    | 443             | 10.0.0.0/XX      | Ephemeral     | 6 (TCP)          | Response from CDN containing files for installation |
+
+
 ## Github Clone Repository
 
 | **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                             |
