@@ -27,6 +27,41 @@ All outgoing traffic is evaluated against VPC-wide [firewall rules](https://clou
 | `egress-allow-restricted-gcp-services` | egress    | 65534             | `199.36.153.4/30` | all                                                                                                                                                                                                                    | TODO: this can probably be removed, assuming we use user managed instances in favour of gcp managed instances. Need to test this before removing.                                                                                           |
 | `egress-allow-pypi-fastly`             | egress    | 65534             | `151.101.64.223, 199.232.36.223`  | `443`                                                                                                                                                                                                                  | Allow egress from instances in this network to PyPI and Fastly IPs. At the time of writing, these are the specific IPs resolved for the closest CDN for PyPI and Fastly from the Montreal datacenter, where the notebook instances run. We have to periodically review and update these IP addresses, as they may change due to infrastructure updates or CDN provider modifications.  <br> TODO: Set up a custom Artifactory on GCP to serve as a proxy for PyPI.                                   |
  
+Notes:
+
+The IPs for PyPI could be obtained using the ```dig``` command and the IPs for Fastly can be obtained using their public IP - https://api.fastly.com/public-ip-list
+
+```console
+(base) ➜  ~ dig pypi.org
+
+; <<>> DiG 9.10.6 <<>> pypi.org
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 36957
+;; flags: qr rd ra; QUERY: 1, ANSWER: 4, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;pypi.org.			IN	A
+
+;; ANSWER SECTION:
+pypi.org.		51399	IN	A	151.101.0.223
+pypi.org.		51399	IN	A	151.101.64.223
+pypi.org.		51399	IN	A	151.101.128.223
+pypi.org.		51399	IN	A	151.101.192.223
+
+;; Query time: 15 msec
+;; SERVER: 64.59.144.93#53(64.59.144.93)
+;; WHEN: Wed Jan 24 08:28:31 PST 2024
+;; MSG SIZE  rcvd: 101
+```  
+  
+```console
+(base) ➜  ~ curl https://api.fastly.com/public-ip-list
+{"addresses":["23.235.32.0/20","43.249.72.0/22","103.244.50.0/24","103.245.222.0/23","103.245.224.0/24","104.156.80.0/20","140.248.64.0/18","140.248.128.0/17","146.75.0.0/17","151.101.0.0/16","157.52.64.0/18","167.82.0.0/17","167.82.128.0/20","167.82.160.0/20","167.82.224.0/20","172.111.64.0/18","185.31.16.0/22","199.27.72.0/21","199.232.0.0/16"],"ipv6_addresses":["2a04:4e40::/32","2a04:4e42::/32"]}%
+```
+
 
 ## Access via Authenticated HTTPS Proxy
 
