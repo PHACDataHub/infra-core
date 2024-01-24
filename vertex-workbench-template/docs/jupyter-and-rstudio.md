@@ -24,7 +24,7 @@ By default, the [Rocker RStudio](https://rocker-project.org/images/versioned/rst
 
 ### Cloud Workstation Upgrades
 
-As per the upstream documentation on [Cloud Workstations architecture](https://cloud.google.com/workstations/docs/architecture#vpc-network), it is possible to configure cloud workstations to retain the persistent disk when the unerlying cloud VM is deleted via the setting cloud workstations' [reclaim policy](https://cloud.google.com/workstations/docs/customize-development-environment#reclaimpolicy). Setting this reclaim policy allows the persistent disk to be mounted to a newly created VM instance, thereby allowing the base VM instance to be periodically destroyed and recreated to allow for updates to the underlying operating system.
+As per the upstream documentation on [Cloud Workstations architecture](https://cloud.google.com/workstations/docs/architecture#vpc-network), it is possible to configure cloud workstations to retain the persistent disk when the unerlying cloud VM is deleted via the setting cloud workstations' [reclaim policy](https://cloud.google.com/workstations/docs/customize-development-environment#reclaimpolicy). Setting this reclaim policy enables the persistent disk to be mounted to a newly created VM instance, thereby allowing the base VM instance to be periodically destroyed and recreated so that updates to the underlying operating system can happen.
 
 ### GCP VM Image Scanning and Upgrades
 
