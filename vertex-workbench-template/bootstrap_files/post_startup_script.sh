@@ -69,6 +69,12 @@ function disable_nbconvert() {
   pip uninstall nbconvert
 }
 
+function install_pip_packages() {
+  pip install \
+      openpyxl \
+      great-expectations
+}
+
 function main() {
 
   echo "Checking if must disable downloads..."
@@ -88,6 +94,9 @@ function main() {
     echo "Try to restart jupyter.service..."
     systemctl restart jupyter.service || echo 'Error restarting jupyter.service.'
   fi
+
+  echo "Installing additional pip dependencies..."
+  install_pip_packages || echo "Error installing packages"
 
 }
 
