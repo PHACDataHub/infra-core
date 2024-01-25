@@ -25,8 +25,11 @@ All outgoing traffic is evaluated against VPC-wide [firewall rules](https://clou
 | `egress-allow-tcp-git`                 | egress    | 65534             | `140.82.112.0/20` | `80, 443`                                                                                                                                                                                                              | Corresponding rule to `ingress-allow-tcp-git`.                                                                                                                                                                                              |
 | `egress-allow-private-gcp-services`    | egress    | 65534             | `199.36.153.8/30` | all | Allow egress from instances on this network to the [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid), which is only routable from within Google Cloud. |
 | `egress-allow-restricted-gcp-services` | egress    | 65534             | `199.36.153.4/30` | all                                                                                                                                                                                                                    | TODO: this can probably be removed, assuming we use user managed instances in favour of gcp managed instances. Need to test this before removing.                                                                                           |
-| `egress-allow-pypi-fastly`             | egress    | 65534             | `151.101.64.223, 199.232.36.223`  | `443`                                                                                                                                                                                                                  | Allow egress from instances in this network to PyPI and Fastly IPs. At the time of writing, these are the specific IPs resolved for the closest CDN for PyPI and Fastly from the Montreal datacenter, where the notebook instances run. We have to periodically review and update these IP addresses, as they may change due to infrastructure updates or CDN provider modifications.  <br> TODO: Set up a custom Artifactory on GCP to serve as a proxy for PyPI.                                   |
+| `egress-allow-pypi-fastly`             | egress    | 65534             | `151.101.64.223, 199.232.36.223`  | `443`                                                                                                                                                                                                                  | Allow egress from instances in this network to PyPI and Fastly IPs. At the time of writing, these are the specific IPs resolved for the closest CDN for PyPI and Fastly from the Montreal datacenter, where the notebook instances run. We have to periodically review and update these IP addresses, as they may change due to infrastructure updates or CDN provider modifications.                           |
  
+**Notes**:
+
+- The whitelisted IP address for [pypi.org](https://pypi.org) was obtained with a `dig` query, and the whitelisted IP address for Fastly can be found from their [public IP list](https://api.fastly.com/public-ip-list). The purpose of whitelisting these IP addresses is that the `post_startup_script.sh` shell script can be used to install project-specific Python packages so they are available in the base Python virtual environment. **TODO**: In the future, this could be changed to proxy package installs through an artifact registry (e.g. [Artifactory](https://jfrog.com/artifactory/) or similar product) rather than installing directly from the upstream source.
 
 ## Access via Authenticated HTTPS Proxy
 
@@ -53,10 +56,9 @@ Authenticated and authorized users have their request to the proxy server forwar
 
 ## DNS
 
-A number of Google APIs need to be accessed for various purposes.
+Following the example of Datatonic's [terrafrom-google-secure-vertex-workbench](https://github.com/teamdatatonic/terraform-google-secure-vertex-workbench/tree/main) terraform module, we create private [DNS response policy rules](https://cloud.google.com/dns/docs/zones/manage-response-policies) to map DNS records to GCP's [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid) rather than using Google's public IP ranges.
 
-| API | Purpose |
-| --- | ------- |
+Specifically, DNS queries matching `*.googleapis.com`, `*.gcr.io`, `*.pkg.dev`, or `*.notebooks.cloud.google.com` are routed to an IP address in `199.36.153.8/30`.
 
 # Network Flows
 
