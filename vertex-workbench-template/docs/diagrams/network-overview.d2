@@ -40,7 +40,7 @@ TB Project: {
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
     }
 
-    ingress-allow-tcp-git: {
+    ingress-deny-all: {
       shape: image
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
     }
@@ -81,10 +81,15 @@ TB Project: {
         icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20NAT.svg
       }
 
-      user managed notebook: {
-        "": {
+      user managed notebooks and cloud workstations : {
+        "vertex workbench": {
           shape: image
           icon: ./icons/vertexai.png
+        }
+        
+        "cloud workstations": {
+          shape: image
+          icon: https://cloud.google.com/static/docs/images/logos/cloud-workstations.svg
         }
 
         gce virtual machine: {
@@ -96,6 +101,11 @@ TB Project: {
           jupyterlab: {
             shape: image
             icon: https://upload.wikimedia.org/wikipedia/commons/3/38/Jupyter_logo.svg
+          }
+
+          R/RStudio: {
+            shape: image
+            icon: https://www.r-project.org/logo/Rlogo.svg
           }
 
           proxy-forwarding-agent: {
@@ -115,7 +125,7 @@ Google APIs and Services: {
 
   \<random characters\>\.northamerica-northeast1\.notebooks\.cloud\.google\.com
 
-  Artifact Registry: {
+    Artifact Registry: {
     shape: image
     icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FDeveloper%20Tools%2FContainer%20Registry.svg
   }
@@ -149,21 +159,14 @@ Client Browser: {
 }
 
 # tcp ingress from github IPs is allowed
-GitHub -> TB Project.custom mode VPC.ingress-allow-tcp-git -> TB Project.custom mode VPC.nat-auto-external-ip <-> TB Project.custom mode VPC.subnetwork.cloud-nat <-> TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab: {
-  style: {
-    stroke: green
-  }
-}
-
-# tcp egress to github IPs is allowed
-GitHub <- TB Project.custom mode VPC.egress-allow-tcp-git <- TB Project.custom mode VPC.nat-auto-external-ip: {
+GitHub <- TB Project.custom mode VPC.egress-allow-tcp-git <- TB Project.custom mode VPC.nat-auto-external-ip <- TB Project.custom mode VPC.subnetwork.cloud-nat <- TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab: {
   style: {
     stroke: green
   }
 }
 
 # by default, egress is denied
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab -> TB Project.custom mode VPC.subnetwork.cloud-nat -> TB Project.custom mode VPC.nat-auto-external-ip -> TB Project.custom mode VPC.egress-deny-all: {
+TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab -> TB Project.custom mode VPC.subnetwork.cloud-nat -> TB Project.custom mode VPC.nat-auto-external-ip -> TB Project.custom mode VPC.egress-deny-all: {
   style: {
     stroke: red
     stroke-dash: 3
@@ -177,13 +180,21 @@ TB Project.custom mode VPC.egress-deny-all -> internet: deny {
   }
 }
 
+TB Project.custom mode VPC.ingress-deny-all <- internet: deny {
+  style: {
+    stroke: red
+    stroke-dash: 3
+  }
+}
+
+
 # proxy-forwarding-agent pulled from google service artifact registry
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab <-> TB Project.custom mode VPC.gcr\.io: googleapis IPs {
+TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab <-> TB Project.custom mode VPC.gcr\.io: googleapis IPs {
   style: {
     stroke: orange
   }
 }
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab -> TB Project.custom mode VPC.private-googleapis-ips-route -> TB Project.custom mode VPC.egress-allow-private-gcp-services -> Google APIs and Services.Private Google Services: {
+TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab -> TB Project.custom mode VPC.private-googleapis-ips-route -> TB Project.custom mode VPC.egress-allow-private-gcp-services -> Google APIs and Services.Private Google Services: {
   style: {
     stroke: orange
   }
@@ -195,13 +206,13 @@ Google APIs and Services.Private Google Services -> Google APIs and Services.Art
 }
 
 # proxy-forwarding-agent initiates request to inverting proxy service
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.proxy-forwarding-agent <-> TB Project.custom mode VPC.notebooks\.cloud\.google\.com: googleapis IPs {
+TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.proxy-forwarding-agent <-> TB Project.custom mode VPC.notebooks\.cloud\.google\.com: googleapis IPs {
   style: {
     stroke: deepskyblue
   }
 }
 
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.proxy-forwarding-agent <-> TB Project.custom mode VPC.private-googleapis-ips-route <-> TB Project.custom mode VPC.egress-allow-private-gcp-services <-> Google APIs and Services.Private Google Services: {
+TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.proxy-forwarding-agent <-> TB Project.custom mode VPC.private-googleapis-ips-route <-> TB Project.custom mode VPC.egress-allow-private-gcp-services <-> Google APIs and Services.Private Google Services: {
   style: {
     stroke: deepskyblue
   }
@@ -214,7 +225,7 @@ Google APIs and Services.Private Google Services -> Google APIs and Services.\*\
 }
 
 # Jupyterlab needs to get ips from private.googleapis.com dns record
-TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.jupyterlab <-> TB Project.custom mode VPC.private\.googleapis\.com: googleapis IPs {
+TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab <-> TB Project.custom mode VPC.private\.googleapis\.com: googleapis IPs {
   style: {
     stroke: orange
   }
@@ -224,7 +235,7 @@ TB Project.custom mode VPC.subnetwork.user managed notebook.gce virtual machine.
 TB Project.custom mode VPC.cloud-router <- TB Project.custom mode VPC.subnetwork.cloud-nat: depends on
 
 # Client browser connects to Google-managed proxy server
-Client Browser."" <-> Google APIs and Services.\<random characters\>\.northamerica-northeast1\.notebooks\.cloud\.google\.com <-> Google APIs and Services.Private Google Services: {
+Client Browser."" <-> Internet <-> Google APIs and Services.\<random characters\>\.northamerica-northeast1\.notebooks\.cloud\.google\.com <-> Google APIs and Services.Private Google Services: {
   style: {
     stroke: deepskyblue
   }

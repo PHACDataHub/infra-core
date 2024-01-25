@@ -20,22 +20,20 @@ locals {
       }
     },
     {
-      name        = "ingress-allow-tcp-git"
-      description = "To allow connection to GitHub git endpoints - Ingress"
-      direction   = "INGRESS"
-      priority    = 65534
-      ranges = [
-        "140.82.112.0/20",
-      ]
+      name                    = "ingress-deny-all"
+      description             = "Blanket default deny rule for egress"
+      direction               = "INGRESS"
+      priority                = 65535
+      ranges                  = ["0.0.0.0/0"]
       source_tags             = null
       source_service_accounts = null
       target_tags             = null
       target_service_accounts = null
-      allow = [{
-        protocol = "tcp"
-        ports    = ["80", "443"]
+      allow                   = []
+      deny = [{
+        protocol = "all"
+        ports    = null # All ports
       }]
-      deny = []
       log_config = {
         metadata = "INCLUDE_ALL_METADATA"
       }
@@ -67,25 +65,6 @@ locals {
       direction               = "EGRESS"
       priority                = 65534
       ranges                  = ["199.36.153.8/30"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = null
-      target_service_accounts = null
-      allow = [{
-        protocol = "all"
-        ports    = null # All ports
-      }]
-      deny = []
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    },
-    {
-      name                    = "egress-allow-restricted-gcp-services"
-      description             = "Allow egress from instances in this network to the google service apis restricted range"
-      direction               = "EGRESS"
-      priority                = 65534
-      ranges                  = ["199.36.153.4/30"]
       source_tags             = null
       source_service_accounts = null
       target_tags             = null
