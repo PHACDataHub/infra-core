@@ -78,25 +78,6 @@ locals {
         metadata = "INCLUDE_ALL_METADATA"
       }
     },
-    {
-      name                    = "egress-allow-restricted-gcp-services"
-      description             = "Allow egress from instances in this network to the google service apis restricted range"
-      direction               = "EGRESS"
-      priority                = 65534
-      ranges                  = ["199.36.153.4/30"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = null
-      target_service_accounts = null
-      allow = [{
-        protocol = "all"
-        ports    = null # All ports
-      }]
-      deny = []
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    },
     # At the time of writing, the GCP terraform module does not expose the workstation cluster control plane IP address.
     # Since we have an Egress deny all rule, we need to explicitly allow egress from a workstation VM to the control plane.
     # In the absence of the control plane IP being exposed by terraform, we need to use an overly permissive
