@@ -20,22 +20,20 @@ locals {
       }
     },
     {
-      name        = "ingress-allow-tcp-git"
-      description = "To allow connection to GitHub git endpoints - Ingress"
-      direction   = "INGRESS"
-      priority    = 65534
-      ranges = [
-        "140.82.112.0/20",
-      ]
+      name                    = "ingress-deny-all"
+      description             = "Blanket default deny rule for egress"
+      direction               = "INGRESS"
+      priority                = 65535
+      ranges                  = ["0.0.0.0/0"]
       source_tags             = null
       source_service_accounts = null
       target_tags             = null
       target_service_accounts = null
-      allow = [{
-        protocol = "tcp"
-        ports    = ["80", "443"]
+      allow                   = []
+      deny = [{
+        protocol = "all"
+        ports    = null # All ports
       }]
-      deny = []
       log_config = {
         metadata = "INCLUDE_ALL_METADATA"
       }
