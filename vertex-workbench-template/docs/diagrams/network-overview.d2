@@ -40,11 +40,6 @@ TB Project: {
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
     }
 
-    ingress-allow-tcp-git: {
-      shape: image
-      icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
-    }
-
     egress-allow-tcp-git: {
       shape: image
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
@@ -159,14 +154,7 @@ Client Browser: {
 }
 
 # tcp ingress from github IPs is allowed
-GitHub -> TB Project.custom mode VPC.ingress-allow-tcp-git -> TB Project.custom mode VPC.nat-auto-external-ip <-> TB Project.custom mode VPC.subnetwork.cloud-nat <-> TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab: {
-  style: {
-    stroke: green
-  }
-}
-
-# tcp egress to github IPs is allowed
-GitHub <- TB Project.custom mode VPC.egress-allow-tcp-git <- TB Project.custom mode VPC.nat-auto-external-ip: {
+GitHub <- TB Project.custom mode VPC.egress-allow-tcp-git <- TB Project.custom mode VPC.nat-auto-external-ip <- TB Project.custom mode VPC.subnetwork.cloud-nat <- TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab: {
   style: {
     stroke: green
   }

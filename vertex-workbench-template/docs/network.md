@@ -92,7 +92,6 @@ This section outlines the details of each network flow.
 - As per the [GitHub metadata API](https://api.github.com/meta), GitHub uses Public IP addresses from the range 140.82.112.0/20.
 - All egress is routed through a NAT Gateway router, so all private source IPs are translated to a public IP via the NAT Gateway.
 
-
 ## Attribution
 
 - [R Icon SVG](https://www.r-project.org/logo/Rlogo.svg) borrowed from R Project website.
