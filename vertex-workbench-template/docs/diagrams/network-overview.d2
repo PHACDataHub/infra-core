@@ -40,6 +40,11 @@ TB Project: {
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
     }
 
+    ingress-deny-all: {
+      shape: image
+      icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
+    }
+
     egress-allow-tcp-git: {
       shape: image
       icon: https://icons.terrastruct.com/gcp%2FProducts%20and%20services%2FNetworking%2FCloud%20Firewall%20Rules.svg
@@ -174,6 +179,14 @@ TB Project.custom mode VPC.egress-deny-all -> internet: deny {
     stroke-dash: 3
   }
 }
+
+TB Project.custom mode VPC.ingress-deny-all <- internet: deny {
+  style: {
+    stroke: red
+    stroke-dash: 3
+  }
+}
+
 
 # proxy-forwarding-agent pulled from google service artifact registry
 TB Project.custom mode VPC.subnetwork.user managed notebooks and cloud workstations.gce virtual machine.jupyterlab <-> TB Project.custom mode VPC.gcr\.io: googleapis IPs {
