@@ -62,7 +62,7 @@ resource "google_workstations_workstation" "workstations" {
   env                    = each.value.env
   annotations            = each.value.annotations
 
-  depends_on = [google_workstations_workstation_config.workstation_configs]
+  depends_on             = [google_workstations_workstation_config.workstation_configs]
 }
 
 resource "google_workstations_workstation_iam_binding" "binding" {
@@ -73,10 +73,10 @@ resource "google_workstations_workstation_iam_binding" "binding" {
   workstation_cluster_id = each.value.workstation_cluster_id
   workstation_config_id  = each.value.workstation_config_id
   workstation_id         = each.key
-  role = [
-    "roles/workstations.user",
-    "roles/workstations.operationViewer"
-  ]
+  role                   = [
+                            "roles/workstations.user",
+                            "roles/workstations.operationViewer"
+                          ]
   members = local.workstation_users
 
   depends_on = [google_workstations_workstation.workstations]
