@@ -37,10 +37,18 @@ Access control is managed through Google Cloud's IAM (Identity and Access Manage
 
 ### Key Security Features
 
-- **Uniform Bucket-Level Access:** Disables ACLs and grants access to the bucket and the data it contains through bucket-level IAM policies.
+Key security features enabled in the [terraform modules](../bucket.tf) include:
 
-- **Force Destroy:** When set to `false`, prevents the automatic deletion of the GCS bucket if it contains data. This acts as a safeguard against accidental data loss during bucket deletion, requiring manual intervention for deletion.
+**Uniform Bucket-Level Access:** Disables Access Control Lists (ACL) and grants access to the bucket and the data it contains through bucket-level IAM policies.
 
-- **Public Access Prevention:** Prevents GCS buckets from being exposed to the public. Enforces access only through Access Control Lists (ACLs) or, as in this case, IAM policies.
+Access to buckets and objects inside can be granted either by ACLs or configuring IAM policies. Unless there are specific requirements such as fine-grained access control to objects in the bucket, [Google reccomends configuring IAM](https://cloud.google.com/storage/docs/access-control/lists#iam-vs-acl).
 
-- **Beyond Corp:** Enable a zero trust security model in the future, through [`BeyondCorp`](https://cloud.google.com/beyondcorp) to restrict user access to the project resources based on [user and device identity](policies-and-procedures.md).
+**Force Destroy:** When set to `false`, prevents the automatic deletion of the GCS bucket if it contains data. This acts as a safeguard against accidental data loss during bucket deletion, requiring manual intervention for deletion.
+
+**Public Access Prevention:** Prevents GCS buckets from being exposed to the public. Enforces access only through Access Control Lists (ACLs) or, as in this case, IAM policies.
+
+[Google reccomends](https://cloud.google.com/storage/docs/public-access-prevention#should-you-use) preventing public access to buckets:
+
+> Use public access prevention if you know your data should never be exposed on the public internet. To provide the most security to your resources, enforce public access prevention at the highest possible level of your organization.
+
+**Beyond Corp:** [Enable context aware access](https://cloud.google.com/beyondcorp) to data in the future by restricting access to GCP resources based on the IP address of the machine accessing the resource.
