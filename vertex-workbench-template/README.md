@@ -14,9 +14,10 @@ The purpose of the analytics environment template is to provide infectious disea
 5. `cd example`
 6. `touch terraform.auto.tfvars` (also `.gitignore`d). This file contains any overrides for default terraform variables. The code snippet inserted below these instructions shows an example that creates a single vertex notebook along with a single GCS bucket.
 7. `terraform init`
-8. `terraform lint`
-9. `terraform plan`
-10. If the plan looks good, then `terraform apply`.
+8. `terraform fmt`
+9. `terraform validate`
+10. `terraform plan`
+11. If the plan looks good, then `terraform apply`.
 
 **Example of `terraform.auto.tfvars`**
 
