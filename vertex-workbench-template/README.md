@@ -12,28 +12,46 @@ The purpose of the analytics environment template is to provide infectious disea
 3. Go to **APIs & Services** --> **Credentials** --> Click the terraform service account (this should look something like `terraform@<project-id>.iam.gserviceaccount.com`) --> Select **KEYS** --> **ADD KEY** --> **Create New Key** --> select **JSON** key type. **This JSON file should be treated as a sensitive value as it contains the private key for the service account**.
 4. Place the service account key from Step 3 in the `example` directory. Rename it `terraform-sa-key.json` (**or another name that is explicitly `.gitignore`d**).
 5. `cd example`
-6. `touch terraform.auto.tfvars` (also `.gitignore`d). This file contains any overrides for default terraform variables. The code snippet inserted below these instructions shows an example that creates a single vertex notebook along with a single GCS bucket.
+6. `touch terraform.auto.tfvars` (also `.gitignore`d). This file contains any overrides for default terraform variables. The code snippet inserted below these instructions shows an example that creates a single vertex notebook along with a single GCS bucket. See example of settings below 
 7. `terraform init`
 8. `terraform fmt`
 9. `terraform validate`
 10. `terraform plan`
+11. Activate in your GCP Project
+- Secret Manager API
+- Artifact Registry API
+- Cloud DNS API
+- Identity and Access Management (IAM) API
+- Stackdriver Monitoring API
+- Service Networking API
+- Cloud Build API
+- Notebooks API
 11. If the plan looks good, then `terraform apply`.
 
-**Example of `terraform.auto.tfvars`**
+**Example of `terraform.auto.tfvars`. Fill <your...> fields**
 
 ```hcl
-project              = "<your project ID>"
-zone                 = "northamerica-northeast1-b"  # `northamerica-northeast1` == Montreal
-region               = "northamerica-northeast1"
-vpc_network_name     = "data-analytics-vpc"
-subnet_ip_cidr_range = "any valid RFC 1918 CIDR"  # E.g. `10.0.0.0/24`
-gcs_bucket_name      = "nb-script"
+project                     = "<your project ID>"
+zone                        = "northamerica-northeast1-b"
+region                      = "northamerica-northeast1"
+vpc_network_name            = "data-analytics-vpc"
+subnet_ip_cidr_range        = "any valid RFC 1918 CIDR"
+gcs_bucket_name             = "<your project ID>-nb-script"
+analytics_bucket_name       = "tb-analytics"
+gcs_labels                  = { "foo" : "bar" }
+notification_channels_email = "<your email>"
+
+logging_project_sink_name = "tb-log-sink"
 
 notebooks = {
   "example-user-managed-instance" : {
-    "instance_owner" : "<gcp email of notebook owner>"
+    "labels" : { "foo" : "bar" },
+    "instance_owner" : "<your gcp email>"
     "metadata" : {}
     "type" : "user-managed-notebook",
+    "vm_image" : {
+      "image_family" : "tf-2-3-cpu"
+    }
   }
 }
 
@@ -63,6 +81,68 @@ additional_fw_rules = [{
     metadata = "INCLUDE_ALL_METADATA"
   }
 }]
+
+# Cloud Build
+cloudbuild_repo = "https://github.com/PHACDataHub/tb-safe-inputs.git"
+
+#[Your GH Personal Access Token] (https://github.com/settings/tokens/new?scopes=repo,admin:org,read:user,admin:enterprise&description=GH-TB-Key)
+#The authorized user has to have the admin permission to repo PHACDataHub/tb-safe-inputs
+github_pat = "<your GH Personal Access Token>"
+
+github_cloudbuild_installation_id = "<Organization's cloudbuild install ID>"
+
+repository_id = "tb-project"
+
+# Cloud Workstations
+
+workstation_users = ["<your gcp email address>"]
+
+google_cloud_workstation_clusters = {
+  "tb-cluster" : {
+    name : "tb-cluster"
+    labels : {}
+    annotations : {}
+    configs : [{
+      workstation : [
+
+      ]
+    }]
+  }
+}
+google_cloud_workstation_configurations = {
+  "rworkstation-config" : {
+    workstation_cluster_id = "tb-cluster"
+    idle_timeout           = "600s"
+    running_timeout        = "21600s"
+    replica_zones          = []
+    annotations            = {}
+    labels                 = {}
+    host = {
+      gce_instance = {
+        machine_type                = "n1-standard-4"
+        boot_disk_size_gb           = 100
+        disable_public_ip_addresses = false
+        service_account             = "your project default terraform service account"
+      }
+    }
+    container = {
+      image = "northamerica-northeast1-docker.pkg.dev/<your project ID>/tb-project/rstudio-env:rstudio-0.0.5"
+      env = {
+        NAME = "FOO"
+        BABE = "bar"
+      }
+    }
+  }
+}
+google_cloud_workstations = {
+  "test-workstation" : {
+    workstation_cluster_id : "tb-cluster"
+    workstation_config_id : "rworkstation-config"
+    labels : { "label" = "key" }
+    env : { "name" = "foo" }
+    annotations : { "label-one" = "value-one" }
+  }
+}
 ```
 
 ## Table of Contents
