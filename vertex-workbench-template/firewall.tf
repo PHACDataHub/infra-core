@@ -128,6 +128,30 @@ locals {
       log_config = {
         metadata = "INCLUDE_ALL_METADATA"
       }
+    },
+    # At the time of writing, this is the specific IP resolved for the CRAN mirror hosted in a UWaterloo server
+    # We need to periodically review and update this if they ever change due to infrastructure updates or if the mirror
+    # is found inadequate for required packages.
+    {
+      name        = "egress-allow-cran-mirror"
+      description = "Allow egress from instances in this network to the UWaterloo CRAN mirror"
+      direction   = "EGRESS"
+      priority    = 65534
+      ranges = [
+        "129.97.134.71"
+      ]
+      source_tags             = null
+      source_service_accounts = null
+      target_tags             = null
+      target_service_accounts = null
+      allow = [{
+        protocol = "tcp"
+        ports    = ["443"]
+      }]
+      deny = []
+      log_config = {
+        metadata = "INCLUDE_ALL_METADATA"
+      }
     }
   ]
   fw_rules = concat(local.default_fw_rules, var.additional_fw_rules)
