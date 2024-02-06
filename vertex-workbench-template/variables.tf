@@ -234,8 +234,8 @@ variable "google_cloud_workstations" {
   }))
 }
 
-variable "workstation_users" {
-  description = "List of workstation users"
+variable "project_principals" {
+  description = "List of principals who will access the resources in the project"
   type        = list(string)
 }
 

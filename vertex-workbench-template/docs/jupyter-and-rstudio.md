@@ -41,3 +41,40 @@ This template provisions a Cloud Build trigger to watch a project-specific Git r
 By default, we recommend using [Git tags](https://git-scm.com/book/en/v2/Git-Basics-Tagging) to trigger image builds so that project teams can be intentional about upgrading their images. Moreover, if teams opt for a solution like Trivy for vulnerability scanning, they can defer tagging a commit until the CI pipeline for that commit passes the Trivy vulnerability scan. However, project teams are free to choose the mechanism through which image builds are triggered as this is a project-specific implementation detail.
 
 GCP Cloud Build is always used to build the image and push it to the project's [Artifact regsitry](https://cloud.google.com/artifact-registry). The reason for this decision is that it eliminates the need for an external entity to authenticate with GCP and initiate an image push over the public internet. Instead, the image build occurs from an internal GCP service and the image push to the project's artifact registry occers over a private network connection rather than over the public internet.
+
+# Role-Based Access Control
+
+This section outlines the security features and access control measures for Jupyter notebooks and R Studio workstations.
+
+## Personas and Workstation Roles
+
+Access control for Jupyter and R Studio workstations is managed through Google Cloud's IAM roles. Different roles are assigned to each persona based on their responsibilities.
+
+### 1. Epidemiologist/Data Scientist User
+
+- **Role: Viewer**
+  - **Access:**
+    - Inherits viewer roles for both notebooks and workstations from the project-scoped `roles/viewer`.
+    - Can list instances and view details of notebook and workstation instances.
+
+- **Role: Service Account ActAs:**
+  - **Access:**
+    - Can act as the service account that runs in the VMs.
+    - Allows connecting to and running instances on behalf of the service account.
+
+- **Role: Workstation User:**
+  - **Access:**
+     - For R Studio workstation instances, has the role "Workstation User" to start and connect to the workstations instances.
+
+## Key Security Features
+
+- **Public IP Prevention:**
+  - VMs running jupyter notebooks and R workstations are in the VPC subnet and do not have public IP addresses, protected by the network firewall rules.
+
+- **Service Account Security:**
+  - Service accounts have roles that align with their specific tasks, promoting the principle of least privilege.
+  - Viewer role restricts the ability of the user to create own instances. So there is no instance that is possible outside the VPC subnet that can access the data.
+
+- **Beyond Corp:**
+  - Enabling context-aware access in the future to accessing notebook and workstation instances through the console by restricting access based on the IP address of the machine accessing the resources.
+

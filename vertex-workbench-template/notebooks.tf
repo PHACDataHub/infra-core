@@ -23,8 +23,6 @@ resource "google_notebooks_instance" "notebook_instance" {
 
   labels = lookup(each.value, "nb_labels", null)
 
-  instance_owners = [lookup(each.value, "instance_owner", null)]
-
   service_account = google_service_account.vertex_service_account.email
 
   metadata = {
@@ -35,7 +33,7 @@ resource "google_notebooks_instance" "notebook_instance" {
     report-system-health       = lookup(each.value["metadata"], "report-system-health", "true")
     # no direct config option for auto-upgrades (https://github.com/hashicorp/terraform-provider-google/issues/11660)
     # using metadata as temporary work-around.
-    notebook-upgrade-schedule  = "00 19 * * MON"  
+    notebook-upgrade-schedule  = "00 19 * * MON"
   }
   post_startup_script = "${google_storage_bucket.bucket.url}/${google_storage_bucket_object.postscript.name}"
 

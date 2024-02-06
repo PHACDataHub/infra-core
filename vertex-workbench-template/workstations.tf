@@ -1,5 +1,5 @@
 locals {
-  workstation_users = [for email in var.workstation_users : "user:${email}"]
+  workstation_users = [for email in var.project_principals : "user:${email}"]
 }
 
 resource "google_workstations_workstation_cluster" "workstation_clusters" {
@@ -63,4 +63,17 @@ resource "google_workstations_workstation" "workstations" {
   annotations            = each.value.annotations
 
   depends_on = [google_workstations_workstation_config.workstation_configs]
+}
+
+resource "google_workstations_workstation_iam_binding" "workstation_user_binding" {
+  for_each               = var.google_cloud_workstations
+  provider               = google-beta
+  project                = var.project
+  location               = var.region
+  workstation_cluster_id = each.value.workstation_cluster_id
+  workstation_config_id  = each.value.workstation_config_id
+  workstation_id         = each.key
+  role                   = "roles/workstations.user"
+  members                = local.workstation_users
+  depends_on             = [google_workstations_workstation.workstations]
 }

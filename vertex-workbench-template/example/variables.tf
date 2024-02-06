@@ -157,7 +157,7 @@ variable "google_cloud_workstations" {
   }))
 }
 
-variable "workstation_users" {
+variable "project_principals" {
   description = "List of workstation users"
   type        = list(string)
 }

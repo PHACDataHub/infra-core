@@ -21,5 +21,5 @@ module "private_vertex_nb_instances" {
   google_cloud_workstation_clusters       = var.google_cloud_workstation_clusters
   google_cloud_workstation_configurations = var.google_cloud_workstation_configurations
   google_cloud_workstations               = var.google_cloud_workstations
-  workstation_users                       = var.workstation_users
+  project_principals                      = var.project_principals
 }
