@@ -25,10 +25,11 @@ All outgoing traffic is evaluated against VPC-wide [firewall rules](https://clou
 | `egress-allow-tcp-git`              | egress    | 65534    | `140.82.112.0/20`                | `80, 443` | Corresponding rule to `ingress-allow-tcp-git`.                                                                                                                                                                                                                                                                                                                                        |
 | `egress-allow-private-gcp-services` | egress    | 65534    | `199.36.153.8/30`                | all       | Allow egress from instances on this network to the [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid), which is only routable from within Google Cloud.                                                                                                                                                                |
 | `egress-allow-pypi-fastly`          | egress    | 65534    | `151.101.64.223, 199.232.36.223` | `443`     | Allow egress from instances in this network to PyPI and Fastly IPs. At the time of writing, these are the specific IPs resolved for the closest CDN for PyPI and Fastly from the Montreal datacenter, where the notebook instances run. We have to periodically review and update these IP addresses, as they may change due to infrastructure updates or CDN provider modifications. |
- 
+| `egress-allow-cran-mirror`          | egress    | 65534    | `129.97.134.71`  |       `443`     | Allow egress from instances in this network to the UWaterloo CRAN mirror to install R packages. At the time of writing, this is the specific IP resolved for the CRAN mirror hosted in a UWaterloo server. We need to periodically review and update this if they ever change due to infrastructure updates or if the mirror is found inadequate for required packages. If changed, the default mirror also has to be set in the [environment image](https://github.com/PHACDataHub/tb-safe-inputs/blob/main/rstudio-image/Rprofile.site)           |
 **Notes**:
 
 - The whitelisted IP address for [pypi.org](https://pypi.org) was obtained with a `dig` query, and the whitelisted IP address for Fastly can be found from their [public IP list](https://api.fastly.com/public-ip-list). The purpose of whitelisting these IP addresses is that the `post_startup_script.sh` shell script can be used to install project-specific Python packages so they are available in the base Python virtual environment. **TODO**: In the future, this could be changed to proxy package installs through an artifact registry (e.g. [Artifactory](https://jfrog.com/artifactory/) or similar product) rather than installing directly from the upstream source.
+- The whitelisted IP for the CRAN mirror was obtained with a `dig` query for the server that was found in [CRAN's official website](https://cran.r-project.org/mirrors.html). The purpose of whitelisting these IPs is for workstation users to install required R packages. **TODO**: In the future, this could be changed to proxy package installs through an artifact registry (e.g. [Artifactory](https://jfrog.com/integration/cran-packages-repository/) or similar product) rather than installing directly from the upstream source.
 
 ## Access via Authenticated HTTPS Proxy
 
@@ -67,7 +68,13 @@ This section outlines the details of each network flow.
 
 - The CIDR 10.0.0.0/XX is used as a stand-in for a dynamically allocated RFC 1918 private IP address from the subnet.
 
-## Notebook Start Up and Authenticated Connection to Notebook Server
+## Notebook Server Instances to Google Services
+
+The following operations involve network flows between the VM running the notebook instances and a google managed proxy server, that handles all requests to Google services:
+
+- Notebook Startup and Authentication
+- Image pull from Artifact Registry to VM instance
+- Reading/writing data from Google Cloud Storage to VM instance
 
 | **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                                                                                                        |
 | ------------------ | --------------- | ---------------- | ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -79,6 +86,20 @@ This section outlines the details of each network flow.
 
 - 199.36.153.8/30 refers to the [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid). These IPs are only routable from within Google Cloud.
 
+## Cloud Workstation to Workstation Cluster Control Plane Network Flow
+
+| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                                                                                                           |
+| ------------------ | --------------- | ---------------- | ------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 10.x.x.x           | Ephemeral       | 10.x.x.x         | [Port]        | [Protocol]       | Bidirectional communication between the cloud workstation and the workstation cluster control plane, for initialization, configuration updates and health updates.|
+
+**Notes:**
+
+- One IP from the private IP range is assigned to the control plane of the workstation cluster.
+
+This network flow facilitates seamless interaction and coordination between the cloud workstation and the central control plane components of the workstation cluster.
+
+
+
 ## Installation of PyPI packages in Notebook VM 
 
 | **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                             |
@@ -88,6 +109,18 @@ This section outlines the details of each network flow.
 | 10.0.0.0/XX        | Ephemeral       | 199.232.36.223  | 443           | 6 (TCP)          | VM instance initiates HTTPS connection to Fastly server for the source code files/distribution archives of packages to install |
 | 199.232.36.223    | 443             | 10.0.0.0/XX      | Ephemeral     | 6 (TCP)          | Response from CDN containing files for installation |
 
+**Notes**
+- We enable certain python packages to be installed as part of the post-install script, so network flows to specific upstream package repositories must be allowed.
+
+## Installation of R packages from CRAN Mirror for Workstation VM
+
+| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                                              |
+| ------------------ | --------------- | ---------------- | ------------- | ---------------- | -------------------------------------------------------------- |
+| 10.0.0.0/XX        | Ephemeral       | 129.97.134.71    | 443           | 6 (TCP)          | Workstation VM initiates HTTPS connection to CRAN mirror for package information and downloads |
+| 129.97.134.71      | 443             | 10.0.0.0/XX      | Ephemeral     | 6 (TCP)          | Response from CRAN mirror with package information and files for installation |
+
+**Notes**
+- We enable workstation users to install R packages in their sessions in the workstation instances, so network flows to the upstream CRAN mirror must be allowed.
 
 ## Github Clone Repository
 
@@ -100,6 +133,14 @@ This section outlines the details of each network flow.
 
 - As per the [GitHub metadata API](https://api.github.com/meta), GitHub uses Public IP addresses from the range 140.82.112.0/20.
 - All egress is routed through a NAT Gateway router, so all private source IPs are translated to a public IP via the NAT Gateway.
+
+## Downloading/Uploading files via Cloud console:
+
+**Notes**
+- Communication between user workstations and Google Cloud Storage via the Cloud console is over the public internet. The confidentiality and integrity of data is protected via HTTPS encryption. 
+- Although communication occurs over the public internet, all teams instantiating this template agree to access the Cloud console to upload/download data from Cloud Storage only on the official workstations connected to the organization's VPN.
+- Going forward, Beyond Corp will be used to enforce context awareness to permit access to the Cloud console only from devices with an IP address belonging to a VPN CIDR.
+- More information can be found in the [Policies and Procedures](./policies-and-procedures.md). 
 
 ## Attribution
 

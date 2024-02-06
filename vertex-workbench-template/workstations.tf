@@ -65,20 +65,6 @@ resource "google_workstations_workstation" "workstations" {
   depends_on = [google_workstations_workstation_config.workstation_configs]
 }
 
-resource "google_workstations_workstation_iam_binding" "binding" {
-  for_each               = var.google_cloud_workstations
-  provider               = google-beta
-  project                = var.project
-  location               = var.region
-  workstation_cluster_id = each.value.workstation_cluster_id
-  workstation_config_id  = each.value.workstation_config_id
-  workstation_id         = each.key
-  role                   = "roles/workstations.user"
-  members                = local.workstation_users
-
-  depends_on = [google_workstations_workstation.workstations]
-}
-
 resource "google_workstations_workstation_iam_binding" "workstation_user_binding" {
   for_each               = var.google_cloud_workstations
   provider               = google-beta
