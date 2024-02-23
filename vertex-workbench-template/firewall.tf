@@ -129,7 +129,7 @@ locals {
       }
     }
   ]
-  fw_rules = concat(local.default_fw_rules, var.additional_fw_rules)
+  fw_rules = local.default_fw_rules
 }
 
 resource "google_compute_firewall" "fw_rules" {

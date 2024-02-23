@@ -64,35 +64,6 @@ variable "gcs_labels" {
   default     = null
 }
 
-# Firewall Rules Variables
-
-variable "additional_fw_rules" {
-  description = "Additional firewall rules that you may want to create to allow other traffic"
-  type = list(object({
-    name                    = string
-    description             = string
-    direction               = string
-    priority                = number
-    ranges                  = list(string)
-    source_tags             = optional(list(string))
-    source_service_accounts = optional(list(string))
-    target_tags             = optional(list(string))
-    target_service_accounts = optional(list(string))
-    allow = list(object({
-      protocol = string
-      ports    = list(string)
-    }))
-    deny = list(object({
-      protocol = string
-      ports    = list(string)
-    }))
-    log_config = optional(object({
-      metadata = string
-    }))
-  }))
-  default = []
-}
-
 variable "notification_channels_email" {
   description = "Email address to send notifications for Alert Policies"
   type        = string
