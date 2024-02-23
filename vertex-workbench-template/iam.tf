@@ -4,7 +4,7 @@ locals {
     "roles/logging.logWriter",
     "roles/artifactregistry.reader",
   ]
-  vertex_nb_sa_roles = concat(local.default_vertex_nb_sa_roles, var.additional_vertex_nb_sa_roles)
+  vertex_nb_sa_roles = concat(local.default_vertex_nb_sa_roles)
 
   default_principal_roles = [
     "roles/storage.objectAdmin",

@@ -17,14 +17,6 @@ variable "region" {
   default     = "northamerica-northeast1"
 }
 
-# IAM Variables
-
-variable "additional_vertex_nb_sa_roles" {
-  description = "Additional roles that you may want to assign to the Vertex AI NB SA"
-  type        = list(string)
-  default     = []
-}
-
 # VPC Network Variables
 
 variable "vpc_network_name" {
