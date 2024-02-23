@@ -4,7 +4,7 @@ title: |md
   # Analytics Environment
 |
 
-On-Prem/VPN: {
+On-Prem/VPN Before: {
   Epidemiologists: {
     shape: image
     icon: https://icons.terrastruct.com/essentials%2F359-users.svg
@@ -22,13 +22,27 @@ On-Prem/VPN: {
     icon: https://avatars.githubusercontent.com/u/4522949?v=4
   }
 
+  Liquid Files -> Epidemiologists: e-mail P/T xlsx files
+  Epidemiologists -> Browser: upload xlsx
+}
+
+On-Prem/VPN After: {
+  Epidemiologists: {
+    shape: image
+    icon: https://icons.terrastruct.com/essentials%2F359-users.svg
+  }
+
+  Browser: {
+    console\.google\.cloud\.com: {
+      shape: image
+      icon: https://icons.terrastruct.com/tech%2Fbrowser-2.svg
+    }
+  }
+
   Corporate Filesystem: {
     shape: image
     icon: https://icons.terrastruct.com/essentials%2F245-folder.svg
   }
-
-  Liquid Files -> Epidemiologists: e-mail P/T xlsx files
-  Epidemiologists -> Browser: upload xlsx
   Browser -> Corporate Filesystem: analysis artifacts
 }
 
@@ -52,7 +66,7 @@ Provinces/Territories: {
   Administrators -> Liquid Files: upload xlsx
 }
 
-Provinces/Territories.Liquid Files -> On-Prem/VPN.Liquid Files: transfer
+Provinces/Territories.Liquid Files -> On-Prem/VPN Before.Liquid Files: transfer
 
 GCP Tenant: {
   style: {
@@ -154,7 +168,7 @@ GCP Tenant: {
       }
     }
 
-    vertex-workbench: {
+    cloud-workstation: {
       style: {
         opacity: 0.25
         fill: "#d62d20"
@@ -163,59 +177,42 @@ GCP Tenant: {
         shape: image
         icon: ./icons/vertexai.png
       }
-      data-cleaning-notebook: {
+      data-cleaning-scripts: {
         style: {
-          opacity: 0
+          opacity: 0.5
+          fill: "#d62d20"
         }
-        "data-cleaning-notebook": {
+        "": {
           shape: image
-          icon: https://upload.wikimedia.org/wikipedia/commons/3/38/Jupyter_logo.svg
-        }
-        pandas: {
-          shape: image
-          icon: https://pandas.pydata.org/static/img/pandas.svg
+          icon: https://www.r-project.org/logo/Rlogo.svg
         }
         arrow (in-memory): {
           shape: image
           icon: https://arrow.apache.org/img/arrow-logo_vertical_black-txt_transparent-bg.png
-        }
-        great expectations: {
-          shape: image
-          icon: https://avatars.githubusercontent.com/u/31670619?s=200&v=4
         }
       }
 
-      data-integration-notebook: {
+      data-integration-scripts: {
         style: {
-          opacity: 0
+          opacity: 0.5
+          fill: "#d62d20"
         }
-        "data-integration-notebook": {
+        "": {
           shape: image
-          icon: https://upload.wikimedia.org/wikipedia/commons/3/38/Jupyter_logo.svg
-        }
-        pandas: {
-          shape: image
-          icon: https://pandas.pydata.org/static/img/pandas.svg
+          icon: https://www.r-project.org/logo/Rlogo.svg
         }
         arrow (in-memory): {
           shape: image
           icon: https://arrow.apache.org/img/arrow-logo_vertical_black-txt_transparent-bg.png
-        }
-        great expectations: {
-          shape: image
-          icon: https://avatars.githubusercontent.com/u/31670619?s=200&v=4
         }
       }
 
       data-analysis-notebook: {
         style: {
-          opacity: 0
+          opacity: 0.5
+          fill: "#d62d20"
         }
-        "data-analysis-notebook": {
-          shape: image
-          icon: https://upload.wikimedia.org/wikipedia/commons/3/38/Jupyter_logo.svg
-        }
-        R: {
+        "": {
           shape: image
           icon: https://www.r-project.org/logo/Rlogo.svg
         }
@@ -223,26 +220,26 @@ GCP Tenant: {
     }
 
     # Data cleaning workflow
-    analytics-bucket./upstream/cases/\<yyyy\>/\<pt\>/ -> vertex-workbench.data-cleaning-notebook: read excel
-    analytics-bucket./upstream/outcomes/\<yyyy\>/\<pt\>/ -> vertex-workbench.data-cleaning-notebook: read excel
-    vertex-workbench.data-cleaning-notebook -> analytics-bucket./cases/\<year=yyyy\>/\<pt=XX\>/: write parquet
-    vertex-workbench.data-cleaning-notebook -> analytics-bucket./outcomes/\<year=yyyy\>/\<pt=XX\>/: write parquet
+    analytics-bucket./upstream/cases/\<yyyy\>/\<pt\>/ -> cloud-workstation.data-cleaning-scripts: read excel
+    analytics-bucket./upstream/outcomes/\<yyyy\>/\<pt\>/ -> cloud-workstation.data-cleaning-scripts: read excel
+    cloud-workstation.data-cleaning-scripts -> analytics-bucket./cases/\<year=yyyy\>/\<pt=XX\>/: write parquet
+    cloud-workstation.data-cleaning-scripts -> analytics-bucket./outcomes/\<year=yyyy\>/\<pt=XX\>/: write parquet
     # Data integration workflow
-    analytics-bucket./cases/\<year=yyyy\>/\<pt=XX\>/ -> vertex-workbench.data-integration-notebook: read parquet
-    analytics-bucket./outcomes/\<year=yyyy\>/\<pt=XX\>/ -> vertex-workbench.data-integration-notebook: read parquet
-    vertex-workbench.data-integration-notebook -> analytics-bucket./merged/\<year=yyyy\>/\<pt=XX\>/: write parquet
+    analytics-bucket./cases/\<year=yyyy\>/\<pt=XX\>/ -> cloud-workstation.data-integration-scripts: read parquet
+    analytics-bucket./outcomes/\<year=yyyy\>/\<pt=XX\>/ -> cloud-workstation.data-integration-scripts: read parquet
+    cloud-workstation.data-integration-scripts -> analytics-bucket./merged/\<year=yyyy\>/\<pt=XX\>/: write parquet
     # Data analysis workflow
-    analytics-bucket./merged/\<year=yyyy\>/\<pt=XX\>/ -> vertex-workbench.data-analysis-notebook: read parquet
-    vertex-workbench.data-analysis-notebook -> analytics-bucket./outputs/\<year=yyyy\>/.reports
-    vertex-workbench.data-analysis-notebook -> analytics-bucket./outputs/\<year=yyyy\>/.aggregated tables
-    vertex-workbench.data-analysis-notebook -> analytics-bucket./outputs/\<year=yyyy\>/.graphs/plots
+    analytics-bucket./merged/\<year=yyyy\>/\<pt=XX\>/ -> cloud-workstation.data-analysis-notebook: read parquet
+    cloud-workstation.data-analysis-notebook -> analytics-bucket./outputs/\<year=yyyy\>/.reports
+    cloud-workstation.data-analysis-notebook -> analytics-bucket./outputs/\<year=yyyy\>/.aggregated tables
+    cloud-workstation.data-analysis-notebook -> analytics-bucket./outputs/\<year=yyyy\>/.graphs/plots
   }
 }
 # Excel data uploaded to GCS bucket
-On-Prem\/VPN.Browser -> GCP Tenant.\<epi-analyst-project\>.analytics-bucket./upstream/cases/\<yyyy\>/\<pt\>/: upload
-On-Prem\/VPN.Browser -> GCP Tenant.\<epi-analyst-project\>.analytics-bucket./upstream/outcomes/\<yyyy\>/\<pt\>/: upload
+On-Prem/VPN Before.Browser -> GCP Tenant.\<epi-analyst-project\>.analytics-bucket./upstream/cases/\<yyyy\>/\<pt\>/: upload
+On-Prem/VPN Before.Browser -> GCP Tenant.\<epi-analyst-project\>.analytics-bucket./upstream/outcomes/\<yyyy\>/\<pt\>/: upload
 
 # Download final artifacts back to Epidemiologist workstation
-GCP Tenant.\<epi-analyst-project\>.analytics-bucket./outputs/\<year=yyyy\>/.graphs/plots -> On-Prem/VPN.Browser: download
-GCP Tenant.\<epi-analyst-project\>.analytics-bucket./outputs/\<year=yyyy\>/.reports -> On-Prem/VPN.Browser: download
-GCP Tenant.\<epi-analyst-project\>.analytics-bucket./outputs/\<year=yyyy\>/.aggregated tables -> On-Prem/VPN.Browser: download
+GCP Tenant.\<epi-analyst-project\>.analytics-bucket./outputs/\<year=yyyy\>/.graphs/plots -> On-Prem/VPN After.Browser: download
+GCP Tenant.\<epi-analyst-project\>.analytics-bucket./outputs/\<year=yyyy\>/.reports -> On-Prem/VPN After.Browser: download
+GCP Tenant.\<epi-analyst-project\>.analytics-bucket./outputs/\<year=yyyy\>/.aggregated tables -> On-Prem/VPN After.Browser: download
