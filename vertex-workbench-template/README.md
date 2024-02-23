@@ -155,23 +155,23 @@ google_cloud_workstations = {
 
 ## Overview
 
-Provinces and Territories email Excel files to PHAC Epidemiologists using [LiquidFiles](https://docs.liquidfiles.com/userguide.html). PHAC Epidemiologists upload these Excel files directly to a pre-configured [Google Cloud Storage (GCS) bucket](https://cloud.google.com/storage/docs/json_api/v1/buckets) via the Google Cloud Platform (GCP) console.
+Provinces and Territories email Excel files to PHAC Epidemiologists using [LiquidFiles](https://docs.liquidfiles.com/userguide.html). PHAC Epidemiologists upload these Excel files directly to a pre-configured [Google Cloud Storage (GCS) bucket](https://cloud.google.com/storage/docs/json_api/v1/buckets) via the Google Cloud Platform (GCP) console from a work device while connected to the VPN.
 
 ![analytics environment overview](./docs/diagrams/overview.svg)
 
-PHAC Epidemiologists maintain Jupyter notebooks, Python scripts, and R scripts for the following purposes:
+PHAC Epidemiologists maintain R scripts for the following purposes outlined below.
 
 ### 1. Data Cleaning
 
 PHAC Epidemiologists often have no control over the upstream infectious disease surveillance data sent to PHAC by the provinces and territories. Therefore, it is often the case that each province and territory sends the same data with many significant differences in formatting and table schema. These differences require that PHAC epidemiologists have the ability to convert this data to a common schema with a common set of formatting conventions so that the data can be used for national-level analysis and reporting.
 
-To this end, PHAC Epidemiologists maintain a series of data cleaning notebooks and scripts, leveraging common open source tools in the Python Data Science ecosystem such as [Pandas 2.0](https://pandas.pydata.org/docs/dev/whatsnew/v2.0.0.html) (leveraging [Apache Arrow](https://arrow.apache.org/) tables), and [Great Expectations](https://docs.greatexpectations.io/docs/).
+To this end, PHAC Epidemiologists maintain a series of data cleaning R scripts.
 
 All cleaned and validated data are written to a [Parquet](https://parquet.apache.org/) directory in the same GCS bucket.
 
 ### 2. Data Integration
 
-In certain cases, after cleaning the upstream data sources received by the provinces and territories, there may be a data integration step. In this step, two or more data sources may be joined into a de-normalized analysis-ready table, and further data validations may be applied via Great Expectations.
+In certain cases, after cleaning the upstream data sources received by the provinces and territories, there may be a data integration step. In this step, two or more data sources may be joined into a de-normalized analysis-ready table, and further data validations may be applied via R Scripts.
 
 The integrated data are written to another Parquet directory in the same GCS bucket.
 
@@ -187,7 +187,7 @@ The downloaded data, by default, are non-sensitive (e.g. aggregate-level data). 
 
 ## Acknowledgements
 
-This terraform module is based off of the [datatonic google secure vertex workbench](https://github.com/teamdatatonic/terraform-google-secure-vertex-workbench/tree/main) Terraform module.
+This Terraform module is inspired by the [datatonic google secure vertex workbench](https://github.com/teamdatatonic/terraform-google-secure-vertex-workbench/tree/main) Terraform module.
 
 ## Helpful Resources
 
