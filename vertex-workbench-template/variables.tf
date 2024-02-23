@@ -142,10 +142,3 @@ variable "repository_id" {
   description = "The GCP Artifact Registry repository to create for the project."
   type        = string
 }
-
-# List of Project Principles
-
-variable "project_principals" {
-  description = "A list of project principals with access to the GCP project."
-  type        = list(string)
-}
