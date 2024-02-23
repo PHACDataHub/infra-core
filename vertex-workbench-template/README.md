@@ -78,7 +78,7 @@ repository_id = "tb-project"
 
 # Cloud Workstations
 
-workstation_users = ["<your gcp email address>"]
+project_principals = ["<your gcp email address>"]
 
 google_cloud_workstation_clusters = {
   "tb-cluster" : {
