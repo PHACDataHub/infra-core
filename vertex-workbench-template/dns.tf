@@ -124,39 +124,3 @@ resource "google_dns_response_policy_rule" "pkg-dev-response-policy-rule-a" {
     }
   }
 }
-
-resource "google_dns_response_policy_rule" "notebooks-response-policy-rule-cname" {
-  provider = google-beta
-
-  project         = var.project
-  response_policy = google_dns_response_policy.pga-response-policy.response_policy_name
-  rule_name       = "notebooks-cname"
-  dns_name        = "*.notebooks.cloud.google.com."
-
-  local_data {
-    local_datas {
-      name    = "*.notebooks.cloud.google.com."
-      type    = "CNAME"
-      ttl     = 300
-      rrdatas = ["notebooks.cloud.google.com."]
-    }
-  }
-}
-
-resource "google_dns_response_policy_rule" "notebooks-response-policy-rule-a" {
-  provider = google-beta
-
-  project         = var.project
-  response_policy = google_dns_response_policy.pga-response-policy.response_policy_name
-  rule_name       = "notebooks-a"
-  dns_name        = "notebooks.cloud.google.com."
-
-  local_data {
-    local_datas {
-      name    = "notebooks.cloud.google.com."
-      type    = "A"
-      ttl     = 300
-      rrdatas = local.rrdatas
-    }
-  }
-}

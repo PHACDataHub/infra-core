@@ -92,19 +92,3 @@ output "gcs_bucket_url" {
   description = "The base URL of the bucket, in the format gs://<bucket-name>"
   value       = google_storage_bucket.bucket.url
 }
-
-# Notebooks Outputs
-
-output "user_managed_notebook_id" {
-  description = "an identifier for the notebooks with format projects/{{project}}/global/firewalls/{{name}}"
-  value = {
-    for k, nb in google_notebooks_instance.notebook_instance : k => nb.id
-  }
-}
-
-output "google_managed_notebook_id" {
-  description = "an identifier for the notebooks with format projects/{{project}}/global/firewalls/{{name}}"
-  value = {
-    for k, nb in google_notebooks_runtime.runtime_notebook_instance : k => nb.id
-  }
-}

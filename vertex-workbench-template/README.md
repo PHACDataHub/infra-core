@@ -43,23 +43,6 @@ notification_channels_email = "<your email>"
 
 logging_project_sink_name = "tb-log-sink"
 
-notebooks = {
-  "example-user-managed-instance" : {
-    "labels" : { "foo" : "bar" },
-    "instance_owner" : "<your gcp email>"
-    "metadata" : {}
-    "type" : "user-managed-notebook",
-    "vm_image" : {
-      "image_family" : "tf-2-3-cpu"
-    }
-  }
-}
-
-additional_vertex_nb_sa_roles = [
-  "roles/dataproc.editor",
-  "roles/dataproc.hubAgent"
-]
-
 # Only include this if you want to add a specific allow rule to the firewall policies.
 # The example below allows egress to google.com
 additional_fw_rules = [{
