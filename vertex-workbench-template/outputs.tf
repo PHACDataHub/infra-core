@@ -76,11 +76,6 @@ output "pkg-response-policy-rule_id" {
   value       = google_dns_response_policy_rule.pkg-dev-response-policy-rule-cname.id
 }
 
-output "notebooks-response-policy-rule_id" {
-  description = "an identifier for the notebooks dns policy rule with format projects/{{project}}/responsePolicies/{{response_policy}}/rules/{{rule_name}}"
-  value       = google_dns_response_policy_rule.notebooks-response-policy-rule-cname.id
-}
-
 # GCS Bucket Outputs
 
 output "gcs_bucket_self_link" {
