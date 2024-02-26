@@ -25,7 +25,6 @@ The purpose of the analytics environment template is to provide infectious disea
 - Stackdriver Monitoring API
 - Service Networking API
 - Cloud Build API
-- Notebooks API
 11. If the plan looks good, then `terraform apply`.
 
 **Example of `terraform.auto.tfvars`. Fill <your...> fields**
@@ -43,30 +42,8 @@ notification_channels_email = "<your email>"
 
 logging_project_sink_name = "tb-log-sink"
 
-# Only include this if you want to add a specific allow rule to the firewall policies.
-# The example below allows egress to google.com
-additional_fw_rules = [{
-  name                    = "egress-allow-example-google"
-  description             = "Allow egress example"
-  direction               = "EGRESS"
-  priority                = 65534
-  ranges                  = ["142.250.178.14/32"] # google.com
-  source_tags             = null
-  source_service_accounts = null
-  target_tags             = null
-  target_service_accounts = null
-  allow = [{
-    protocol = "tcp"
-    ports    = ["80"]
-  }]
-  deny = []
-  log_config = {
-    metadata = "INCLUDE_ALL_METADATA"
-  }
-}]
-
 # Cloud Build
-cloudbuild_repo = "https://github.com/PHACDataHub/tb-safe-inputs.git"
+cloudbuild_repo = "<Project Repository that this template is instantiated for>"
 
 #[Your GH Personal Access Token] (https://github.com/settings/tokens/new?scopes=repo,admin:org,read:user,admin:enterprise&description=GH-TB-Key)
 #The authorized user has to have the admin permission to repo PHACDataHub/tb-safe-inputs
