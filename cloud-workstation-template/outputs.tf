@@ -75,15 +75,3 @@ output "pkg-response-policy-rule_id" {
   description = "an identifier for the pkg.dev dns policy rule with format projects/{{project}}/responsePolicies/{{response_policy}}/rules/{{rule_name}}"
   value       = google_dns_response_policy_rule.pkg-dev-response-policy-rule-cname.id
 }
-
-# GCS Bucket Outputs
-
-output "gcs_bucket_self_link" {
-  description = "The URI of the created bucket."
-  value       = google_storage_bucket.bucket.self_link
-}
-
-output "gcs_bucket_url" {
-  description = "The base URL of the bucket, in the format gs://<bucket-name>"
-  value       = google_storage_bucket.bucket.url
-}

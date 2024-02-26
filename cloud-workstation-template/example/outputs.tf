@@ -73,15 +73,3 @@ output "pkg-response-policy-rule_id" {
   description = "an identifier for the pkg.dev dns policy rule with format projects/{{project}}/responsePolicies/{{response_policy}}/rules/{{rule_name}}"
   value       = module.private_cloud_workstation_instances.pkg-response-policy-rule_id
 }
-
-# GCS Bucket Outputs
-
-output "gcs_bucket_self_link" {
-  description = "The URI of the created bucket."
-  value       = module.private_cloud_workstation_instances.gcs_bucket_self_link
-}
-
-output "gcs_bucket_url" {
-  description = "The base URL of the bucket, in the format gs://<bucket-name>"
-  value       = module.private_cloud_workstation_instances.gcs_bucket_url
-}
