@@ -32,7 +32,6 @@ All outgoing traffic is evaluated against VPC-wide [firewall rules](https://clou
 
 **Notes**:
 
-- The whitelisted IP address for [pypi.org](https://pypi.org) was obtained with a `dig` query, and the whitelisted IP address for Fastly can be found from their [public IP list](https://api.fastly.com/public-ip-list). The purpose of whitelisting these IP addresses is that the `post_startup_script.sh` shell script can be used to install project-specific Python packages so they are available in the base Python virtual environment. **TODO**: In the future, this could be changed to proxy package installs through an artifact registry (e.g. [Artifactory](https://jfrog.com/artifactory/) or similar product) rather than installing directly from the upstream source.
 - The whitelisted IP for the CRAN mirror was obtained with a `dig` query for the server that was found in [CRAN's official website](https://cran.r-project.org/mirrors.html). The purpose of whitelisting these IPs is for workstation users to install required R packages. **TODO**: In the future, this could be changed to proxy package installs through an artifact registry (e.g. [Artifactory](https://jfrog.com/integration/cran-packages-repository/) or similar product) rather than installing directly from the upstream source.
 
 ## Access via Authenticated HTTPS Proxy
