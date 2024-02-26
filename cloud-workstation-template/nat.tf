@@ -6,7 +6,7 @@ resource "google_compute_router" "router" {
 }
 
 resource "google_compute_router_nat" "nat" {
-  name                   = "${var.vpc_network_name}-vertex-nat"
+  name                   = "${var.vpc_network_name}-workstation-nat"
   project                = var.project
   router                 = google_compute_router.router.name
   region                 = google_compute_router.router.region
@@ -14,7 +14,7 @@ resource "google_compute_router_nat" "nat" {
 
   source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
   subnetwork {
-    name                    = google_compute_subnetwork.vertex-subnetwork.id
+    name                    = google_compute_subnetwork.workstation-subnetwork.id
     source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
   }
 
