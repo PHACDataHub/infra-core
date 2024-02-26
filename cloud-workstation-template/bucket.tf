@@ -1,14 +1,3 @@
-resource "google_storage_bucket" "bucket" {
-  name                        = var.gcs_bucket_name
-  project                     = var.project
-  location                    = var.region
-  labels                      = var.gcs_labels
-  uniform_bucket_level_access = true
-  force_destroy               = true
-  # Disable public access
-  public_access_prevention = "enforced"
-}
-
 resource "google_storage_bucket" "analytics-bucket" {
   name     = "${var.project}-${var.analytics_bucket_name}"
   location = var.region
@@ -27,19 +16,13 @@ resource "google_storage_bucket" "analytics-bucket" {
 }
 
 resource "google_storage_bucket" "logging-bucket" {
-  name = "${var.project}-${var.analytics_bucket_name}-logs"
+  name     = "${var.project}-${var.analytics_bucket_name}-logs"
   location = var.region
-  project = var.project
+  project  = var.project
   # Disable public access
   public_access_prevention = "enforced"
   # Use uniform bucket-level access (i.e. all users in the GCP Project have the same access to the storage bucket)
   uniform_bucket_level_access = true
   # Do NOT force destroy buckets with data in them
   force_destroy = false
-}
-
-resource "google_storage_bucket_object" "postscript" {
-  name   = "post_startup_script.sh"
-  source = "${path.module}/bootstrap_files/post_startup_script.sh"
-  bucket = google_storage_bucket.bucket.name
 }
