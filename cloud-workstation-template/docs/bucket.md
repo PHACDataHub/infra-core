@@ -12,13 +12,13 @@ This section highlights the security features and access control measures to the
 
 Access control is managed through Google Cloud's IAM (Identity and Access Management) roles. The roles assigned to each persona ensure that they have the appropriate level of access based on their responsibilities.
 
-#### 1. **Service Account in Vertex AI Notebook Instance (Used by Analyst)**
+#### 1. **Service Account in Cloud Workstation Instance (Used by Analyst)**
 
 - **Role: Storage Object Admin**
   - **Access:**
     - Read and write access to objects within the GCS bucket.
     - Ability to delete objects within the GCS bucket.
-    - Can manage objects from the Vertex AI notebook environment.
+    - Can manage objects from the Cloud Workstation environment.
 
 #### 2. **Terraform Service Account (Automation/Infrastructure)**
 

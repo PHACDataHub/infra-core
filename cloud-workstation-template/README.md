@@ -1,4 +1,4 @@
-# Vertex Workbench Template
+# Cloud Workstations Template
 
 > [!WARNING]
 > This documentation is still under development as this reference architecture is actively undergoing Security Assessment and Authorization (SA&A).
@@ -7,12 +7,12 @@ The purpose of the analytics environment template is to provide infectious disea
 
 ## Deployment Instructions
 
-1. Clone this repo and checkout the appropriate branch (e.g. `git clone https://github.com/PHACDataHub/infra-core.git` --> `git checkout vertex-template`).
+1. Clone this repo and checkout the appropriate branch (e.g. `git clone https://github.com/PHACDataHub/infra-core.git` --> `git checkout cloud-workstation-template`).
 2. Create a service account for terraform in the GCP Project you want to deploy into. This service account must have the `Owner` role for the project.
 3. Go to **APIs & Services** --> **Credentials** --> Click the terraform service account (this should look something like `terraform@<project-id>.iam.gserviceaccount.com`) --> Select **KEYS** --> **ADD KEY** --> **Create New Key** --> select **JSON** key type. **This JSON file should be treated as a sensitive value as it contains the private key for the service account**.
 4. Place the service account key from Step 3 in the `example` directory. Rename it `terraform-sa-key.json` (**or another name that is explicitly `.gitignore`d**).
 5. `cd example`
-6. `touch terraform.auto.tfvars` (also `.gitignore`d). This file contains any overrides for default terraform variables. The code snippet inserted below these instructions shows an example that creates a single vertex notebook along with a single GCS bucket. See example of settings below 
+6. `touch terraform.auto.tfvars` (also `.gitignore`d). This file contains any overrides for default terraform variables. The code snippet inserted below these instructions shows an example that creates a single cloud workstation along with a single GCS bucket. See example of settings below 
 7. `terraform init`
 8. `terraform fmt`
 9. `terraform validate`
