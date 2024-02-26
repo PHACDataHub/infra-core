@@ -4,7 +4,7 @@ variable "project" {
 }
 
 variable "zone" {
-  description = "The GCP Zone for Vertex Notebook User-Managed Instances"
+  description = "The GCP Zone for Cloud Workstation instances"
   type        = string
 }
 

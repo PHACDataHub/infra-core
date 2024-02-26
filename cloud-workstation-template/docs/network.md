@@ -6,7 +6,7 @@
 
 ## VPC and Subnet
 
-The network for the Vertex Project Template consists of a single [custom-mode VPC network](https://cloud.google.com/vpc/docs/vpc) and a single [regional subnetwork](https://cloud.google.com/vpc/docs/subnets) resource, which is hard-coded to [`northamerica-northeast1`](https://cloud.google.com/compute/docs/regions-zones) (i.e. Montréal). All notebook virtual machines are in this subnet.
+The network for the Cloud Workstation Template consists of a single [custom-mode VPC network](https://cloud.google.com/vpc/docs/vpc) and a single [regional subnetwork](https://cloud.google.com/vpc/docs/subnets) resource, which is hard-coded to [`northamerica-northeast1`](https://cloud.google.com/compute/docs/regions-zones) (i.e. Montréal). All notebook virtual machines are in this subnet.
 
 ## Cloud Network Address Translation (NAT)
 
@@ -33,7 +33,9 @@ All outgoing traffic is evaluated against VPC-wide [firewall rules](https://clou
 
 ## Access via Authenticated HTTPS Proxy
 
-To the best of our knowledge, [User Managed Notebooks](https://cloud.google.com/vertex-ai/docs/workbench/user-managed/introduction) in [Vertex Workbench](https://cloud.google.com/vertex-ai/docs/workbench/introduction) use an [Inverting Proxy](https://github.com/google/inverting-proxy) to enable `https` connections between a user on the public internet and a notebook on the private subnetwork. The diagram below (borrowed from Inverting Proxy documentation) shows the high-level request flow when a client accesses the notebook via the inverting proxy.
+To the best of our knowledge, Cloud Workstation instances use an [Inverting Proxy](https://github.com/google/inverting-proxy) to enable `https` connections between a user on the public internet and a notebook on the private subnetwork. The diagram below (borrowed from Inverting Proxy documentation) shows the high-level request flow when a client accesses the notebook via the inverting proxy.
+
+> TODO: we should verify this mechanism with someone from GCP to verify this is actually what's happening.
 
 ```
 +--------+         +-------+         +-------+         +---------+
