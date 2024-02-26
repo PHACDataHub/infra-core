@@ -8,7 +8,7 @@ resource "google_workstations_workstation_cluster" "workstation_clusters" {
   workstation_cluster_id = each.key
   display_name           = each.value.display_name != null ? each.value.display_name : each.key
   network                = google_compute_network.vpc_network.id
-  subnetwork             = google_compute_subnetwork.vertex-subnetwork.id
+  subnetwork             = google_compute_subnetwork.workstation-subnetwork.id
   location               = var.region
   labels                 = each.value.labels
   annotations            = each.value.annotations

@@ -6,8 +6,8 @@ resource "google_compute_network" "vpc_network" {
   delete_default_routes_on_create = true
 }
 
-resource "google_compute_subnetwork" "vertex-subnetwork" {
-  name                     = "${var.vpc_network_name}-vertex-subnet"
+resource "google_compute_subnetwork" "workstation-subnetwork" {
+  name                     = "${var.vpc_network_name}-workstation-subnet"
   ip_cidr_range            = var.subnet_ip_cidr_range
   region                   = var.region
   project                  = var.project

@@ -12,12 +12,12 @@ output "vpc_self_link" {
 
 output "subnetwork_id" {
   description = "an identifier for the VPC subnetwork with format projects/{{project}}/regions/{{region}}/subnetworks/{{name}}"
-  value       = google_compute_subnetwork.vertex-subnetwork.id
+  value       = google_compute_subnetwork.workstation-subnetwork.id
 }
 
 output "subnetwork_self_link" {
   description = "The URI of the created subnetwork."
-  value       = google_compute_subnetwork.vertex-subnetwork.self_link
+  value       = google_compute_subnetwork.workstation-subnetwork.self_link
 }
 
 output "private_ip_alloc_id" {
