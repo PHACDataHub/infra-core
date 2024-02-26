@@ -2,6 +2,10 @@
 
 ![network-diagram](./diagrams/network-overview.svg)
 
+**Notes**
+
+- The CIDR `10.0.0.0/XX` is used as a stand-in for a dynamically allocated RFC 1918 private IP address from the subnet.
+
 # Networking Components
 
 ## VPC and Subnet
@@ -24,7 +28,7 @@ All outgoing traffic is evaluated against VPC-wide [firewall rules](https://clou
 | `egress-allow-tcp-git`              | egress    | 65534    | `140.82.112.0/20` | `80, 443` | Corresponding rule to `ingress-allow-tcp-git`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `egress-allow-private-gcp-services` | egress    | 65534    | `199.36.153.8/30` | all       | Allow egress from instances on this network to the [IP range for `private.googleapis.com`](https://cloud.google.com/vpc/docs/configure-private-google-access-hybrid), which is only routable from within Google Cloud.                                                                                                                                                                                                                                                                                                                    |
 | `egress-allow-cran-mirror`          | egress    | 65534    | `129.97.134.71`   | `443`     | Allow egress from instances in this network to the UWaterloo CRAN mirror to install R packages. At the time of writing, this is the specific IP resolved for the CRAN mirror hosted in a UWaterloo server. We need to periodically review and update this if they ever change due to infrastructure updates or if the mirror is found inadequate for required packages. If changed, the default mirror also has to be set in the [environment image](https://github.com/PHACDataHub/tb-safe-inputs/blob/main/rstudio-image/Rprofile.site) |
-| `egress-allow-intra-subnet`         | egress    | 65534    | <subnet CIDR>     | all ports | At the time of writing, the GCP terraform module does not expose the workstation cluster control plane IP address. Since we have an Egress deny all rule, we need to explicitly allow egress from a workstation VM to the control plane. In the absence of the control plane IP being exposed by terraform, we need to use an overly permissive rule allowing egress to any IP on the subnet CIDR. See [this github issue](https://github.com/hashicorp/terraform-provider-google/issues/17022) for more information.                     |
+| `egress-allow-intra-subnet`         | egress    | 65534    | `10.0.0.0/xx`     | all ports | At the time of writing, the GCP terraform module does not expose the workstation cluster control plane IP address. Since we have an Egress deny all rule, we need to explicitly allow egress from a workstation VM to the control plane. In the absence of the control plane IP being exposed by terraform, we need to use an overly permissive rule allowing egress to any IP on the subnet CIDR. See [this github issue](https://github.com/hashicorp/terraform-provider-google/issues/17022) for more information.                     |
 
 **Notes**:
 
@@ -66,10 +70,6 @@ Specifically, DNS queries matching `*.googleapis.com`, `*.gcr.io`, `*.pkg.dev`, 
 
 This section outlines the details of each network flow.
 
-**Notes**
-
-- The CIDR 10.0.0.0/XX is used as a stand-in for a dynamically allocated RFC 1918 private IP address from the subnet.
-
 ## Notebook Server Instances to Google Services
 
 The following operations involve network flows between the VM running the notebook instances and a google managed proxy server, that handles all requests to Google services:
@@ -78,10 +78,10 @@ The following operations involve network flows between the VM running the notebo
 - Image pull from Artifact Registry to VM instance
 - Reading/writing data from Google Cloud Storage to VM instance
 
-| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                                                                                                        |
-| ------------------ | --------------- | ---------------- | ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| 10.0.0.0/XX        | Ephemeral       | 199.36.153.8/30  | 443           | 6 (TCP)          | `forwarding-proxy-agent` initiates https connection to Google-managed proxy server via `private.googleapis.com` service. |
-| 199.36.153.8/30    | Ephemeral       | 10.0.0.0/XX      | 443           | 6 (TCP)          | Source IP is from Google-managed proxy server, forwarding https user traffic to notebook sever.                          |
+| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR**  | **Dest Port** | **Protocol No.** | **Extra Details**                                                                                                        |
+| ------------------ | --------------- | ----------------- | ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `10.0.0.0/XX`      | Ephemeral       | `199.36.153.8/30` | 443           | 6 (TCP)          | `forwarding-proxy-agent` initiates https connection to Google-managed proxy server via `private.googleapis.com` service. |
+| `199.36.153.8/30`  | Ephemeral       | `10.0.0.0/XX`     | 443           | 6 (TCP)          | Source IP is from Google-managed proxy server, forwarding https user traffic to notebook sever.                          |
 
 
 **Notes**
@@ -92,7 +92,7 @@ The following operations involve network flows between the VM running the notebo
 
 | **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                                                                                                                                                  |
 | ------------------ | --------------- | ---------------- | ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 10.x.x.x           | Ephemeral       | 10.x.x.x         | [Port]        | [Protocol]       | Bidirectional communication between the cloud workstation and the workstation cluster control plane, for initialization, configuration updates and health updates. |
+| `10.x.x.x`         | Ephemeral       | `10.x.x.x`       | [Port]        | [Protocol]       | Bidirectional communication between the cloud workstation and the workstation cluster control plane, for initialization, configuration updates and health updates. |
 
 **Notes:**
 
@@ -108,18 +108,18 @@ This network flow facilitates seamless interaction and coordination between the 
 
 | **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                                                                              |
 | ------------------ | --------------- | ---------------- | ------------- | ---------------- | ---------------------------------------------------------------------------------------------- |
-| 10.0.0.0/XX        | Ephemeral       | 129.97.134.71    | 443           | 6 (TCP)          | Workstation VM initiates HTTPS connection to CRAN mirror for package information and downloads |
-| 129.97.134.71      | 443             | 10.0.0.0/XX      | Ephemeral     | 6 (TCP)          | Response from CRAN mirror with package information and files for installation                  |
+| `10.0.0.0/XX`      | Ephemeral       | `129.97.134.71`  | 443           | 6 (TCP)          | Workstation VM initiates HTTPS connection to CRAN mirror for package information and downloads |
+| `129.97.134.71`    | 443             | `10.0.0.0/XX`    | Ephemeral     | 6 (TCP)          | Response from CRAN mirror with package information and files for installation                  |
 
 **Notes**
 - We enable workstation users to install R packages in their sessions in the workstation instances, so network flows to the upstream CRAN mirror must be allowed.
 
 ## Github Clone Repository
 
-| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR** | **Dest Port** | **Protocol No.** | **Extra Details**                             |
-| ------------------ | --------------- | ---------------- | ------------- | ---------------- | --------------------------------------------- |
-| 10.0.0.0/XX        | Ephemeral       | 140.82.112.0/20  | 443           | 6 (TCP)          | NAT from 10.0.0.0/XX to regional external IP. |
-| 140.82.112.0/20    | 443             | 10.0.0.0/XX      | Ephemeral     | 6 (TCP)          | NAT from regional external IP to 10.0.0.0/XX. |
+| **Source IP/CIDR** | **Source Port** | **Dest IP/CIDR**  | **Dest Port** | **Protocol No.** | **Extra Details**                               |
+| ------------------ | --------------- | ----------------- | ------------- | ---------------- | ----------------------------------------------- |
+| `10.0.0.0/XX`      | Ephemeral       | `140.82.112.0/20` | 443           | 6 (TCP)          | NAT from `10.0.0.0/XX` to regional external IP. |
+| `140.82.112.0/20`  | 443             | `10.0.0.0/XX`     | Ephemeral     | 6 (TCP)          | NAT from regional external IP to `10.0.0.0/XX`. |
 
 **Notes**
 
