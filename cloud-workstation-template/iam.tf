@@ -1,7 +1,8 @@
 locals {
   default_principal_roles = [
     "roles/storage.objectAdmin",
-    "roles/viewer"
+    "roles/viewer",
+    "roles/artifactregistry.reader",
   ]
 
   service_account_principals = [for email in var.project_principals : "user:${email}"]
