@@ -1,4 +1,4 @@
-module "private_vertex_nb_instances" {
+module "private_cloud_workstation_instances" {
   source                                  = "../"
   project                                 = var.project
   zone                                    = var.zone
