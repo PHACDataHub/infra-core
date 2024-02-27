@@ -35,6 +35,7 @@ resource "google_workstations_workstation_config" "workstation_configs" {
       enable_nested_virtualization = false
       service_account              = each.value.host.gce_instance.service_account
       pool_size                    = each.value.host.gce_instance.pool_size
+      service_account_scopes       = ["https://www.googleapis.com/auth/devstorage.read_write"]
     }
   }
 
