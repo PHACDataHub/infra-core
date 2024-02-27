@@ -124,3 +124,13 @@ variable "repository_id" {
   description = "The GCP Artifact Registry repository to create for the project."
   type        = string
 }
+
+variable "vulnerability_scanning" {
+  description = "On demand or automated vulnerability scanning of images in artifact registry"
+  type = string
+  default = "automated"
+  validation {
+    condition = can(regex("^(disabled|ondemand|automated)$", var.vulnerability_scanning))
+    error_message = "vulnerability_scanning must be one of disable, ondemand or automated"
+  }
+}
